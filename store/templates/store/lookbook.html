@@ -1,0 +1,52 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+
+{% block title %}{% if lang == 'ar' %}لوك بوك{% elif lang == 'fr' %}Lookbook{% else %}Lookbook{% endif %} — MOONBLOCK{% endblock %}
+
+{% block extra_css %}
+<style>
+.lookbook-header{padding:140px 48px 60px;border-bottom:1px solid rgba(200,185,154,.1);}
+.lookbook-grid{columns:3;gap:2px;padding:2px;}
+.lookbook-item{break-inside:avoid;margin-bottom:2px;position:relative;overflow:hidden;cursor:none;display:block;}
+.lookbook-img{width:100%;display:block;transition:transform .6s ease;}
+.lookbook-item:hover .lookbook-img{transform:scale(1.03);}
+.lookbook-overlay{position:absolute;bottom:0;left:0;right:0;padding:24px;background:linear-gradient(to top,rgba(6,6,8,.9),transparent);opacity:0;transition:opacity .3s;}
+.lookbook-item:hover .lookbook-overlay{opacity:1;}
+.lookbook-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;color:var(--white);}
+.lookbook-caption{font-size:11px;color:var(--moon);letter-spacing:.1em;}
+.placeholder-item{break-inside:avoid;margin-bottom:2px;background:var(--dim);display:flex;align-items:center;justify-content:center;}
+.empty-lookbook{padding:120px 48px;text-align:center;color:var(--muted);}
+.empty-lookbook h2{font-family:'Bebas Neue';font-size:56px;letter-spacing:.03em;color:var(--white);margin-bottom:16px;}
+{% if is_rtl %}.lookbook-header{direction:rtl;}{% endif %}
+@media(max-width:900px){.lookbook-header{padding:120px 24px 40px;}.lookbook-grid{columns:2;}}
+@media(max-width:600px){.lookbook-grid{columns:1;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lookbook-header" {% if is_rtl %}dir="rtl"{% endif %}>
+  <p class="section-label">SS 2026</p>
+  <h1 class="section-title" style="font-size:clamp(48px,7vw,80px);">{% if lang == 'ar' %}لوك بوك{% elif lang == 'fr' %}LOOKBOOK{% else %}LOOKBOOK{% endif %}</h1>
+  <p style="color:var(--muted);font-size:12px;letter-spacing:.1em;margin-top:12px;">{% if lang == 'ar' %}مجموعة صور أسلوبنا{% elif lang == 'fr' %}Notre collection de looks{% else %}Our style collection{% endif %}</p>
+</div>
+
+{% if items %}
+<div class="lookbook-grid" style="padding:48px;">
+  {% for item in items %}
+  <div class="lookbook-item">
+    <img src="{{ item.image.url }}" alt="{{ item.title_en }}" class="lookbook-img">
+    <div class="lookbook-overlay">
+      <p class="lookbook-title">{{ item.title|t:lang }}</p>
+      {% if item.caption_en %}<p class="lookbook-caption">{{ item.caption|t:lang }}</p>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-lookbook">
+  <h2>{% if lang == 'ar' %}لوك بوك فارغ{% elif lang == 'fr' %}LOOKBOOK VIDE{% else %}LOOKBOOK EMPTY{% endif %}</h2>
+  <p style="font-size:13px;letter-spacing:.08em;margin-bottom:40px;">{% if lang == 'ar' %}أضف صور الأسلوب من لوحة الإدارة{% elif lang == 'fr' %}Ajoutez des photos dans le panneau d\'administration{% else %}Add lookbook images in the admin panel{% endif %}.</p>
+  <a href="/admin/store/lookbookitem/add/" class="btn-primary">{% if lang == 'ar' %}إضافة صورة{% elif lang == 'fr' %}Ajouter une Image{% else %}Add Image{% endif %}</a>
+</div>
+{% endif %}
+{% endblock %}

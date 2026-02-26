@@ -1,0 +1,87 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+
+{% block title %}{% if lang == 'ar' %}حقيبتك{% elif lang == 'fr' %}Votre Panier{% else %}Your Bag{% endif %} — MOONBLOCK{% endblock %}
+
+{% block extra_css %}
+<style>
+.cart-page{padding:140px 48px 80px;max-width:1100px;margin:0 auto;}
+.cart-title{font-family:'Bebas Neue';font-size:clamp(48px,7vw,80px);letter-spacing:.03em;margin-bottom:60px;}
+.cart-grid{display:grid;grid-template-columns:1fr 360px;gap:60px;align-items:start;}
+.cart-item{display:grid;grid-template-columns:100px 1fr auto;gap:24px;align-items:center;background:var(--dim);padding:24px;margin-bottom:2px;}
+.item-img{width:100px;height:120px;object-fit:cover;display:block;}
+.item-ph{width:100px;height:120px;background:#1a1520;display:flex;align-items:center;justify-content:center;}
+.item-name{font-family:'Syne';font-size:16px;font-weight:700;margin-bottom:4px;color:var(--white);}
+.item-meta{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:16px;}
+.item-qty{display:flex;align-items:center;gap:12px;}
+.qty-btn{width:32px;height:32px;border:1px solid rgba(200,185,154,.2);background:transparent;color:var(--white);font-size:14px;cursor:none;transition:border-color .2s;}
+.qty-btn:hover{border-color:var(--moon);}
+.item-price{font-family:'Bebas Neue';font-size:22px;color:var(--moon);text-align:right;white-space:nowrap;}
+.remove-btn{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:none;transition:color .2s;display:block;margin-top:8px;text-align:right;}
+.remove-btn:hover{color:#e8534a;}
+.order-summary{background:var(--dim);padding:40px;position:sticky;top:100px;}
+.summary-title{font-family:'Bebas Neue';font-size:28px;letter-spacing:.05em;margin-bottom:32px;border-bottom:1px solid rgba(200,185,154,.1);padding-bottom:20px;}
+.summary-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:16px;}
+.summary-total{margin-top:24px;padding-top:24px;border-top:1px solid rgba(200,185,154,.15);font-size:16px;color:var(--moon);font-family:'Bebas Neue';letter-spacing:.05em;}
+.checkout-btn{width:100%;padding:18px;background:var(--moon);color:var(--black);border:none;font-family:'DM Mono';font-size:13px;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:background .3s;margin-top:24px;text-decoration:none;display:block;text-align:center;}
+.checkout-btn:hover{background:var(--accent);}
+.empty-cart{text-align:center;padding:100px 0;}
+.empty-cart h2{font-family:'Bebas Neue';font-size:56px;letter-spacing:.03em;margin-bottom:16px;}
+{% if is_rtl %}.cart-page{direction:rtl;}.item-price{text-align:left;}.remove-btn{text-align:left;}{% endif %}
+@media(max-width:900px){.cart-page{padding:120px 20px 60px;}.cart-grid{grid-template-columns:1fr;}.cart-item{grid-template-columns:80px 1fr;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-page" {% if is_rtl %}dir="rtl"{% endif %}>
+  <h1 class="cart-title">{% if lang == 'ar' %}حقيبتك{% elif lang == 'fr' %}VOTRE PANIER{% else %}YOUR BAG{% endif %} {% if items %}<span style="color:var(--moon);">({{ items|length }})</span>{% endif %}</h1>
+
+  {% if items %}
+  <div class="cart-grid">
+    <div>
+      {% for item in items %}
+      <div class="cart-item" id="item-{{ item.key }}">
+        {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="" class="item-img">
+        {% else %}<div class="item-ph"><svg width="40" height="40" viewBox="0 0 120 120" fill="none" opacity=".4"><rect x="20" y="10" width="80" height="100" rx="4" stroke="#C8B99A" stroke-width="1.5"/></svg></div>{% endif %}
+        <div>
+          <p class="item-name">{{ item.product.name|t:lang }}</p>
+          <p class="item-meta">{% if item.size %}{% if lang == 'ar' %}مقاس{% elif lang == 'fr' %}Taille{% else %}Size{% endif %}: {{ item.size }} · {% endif %}{{ item.product.price }} MAD</p>
+          <div class="item-qty">
+            <button class="qty-btn" onclick="updateItem('{{ item.key }}',{{ item.quantity }}-1)">−</button>
+            <span>{{ item.quantity }}</span>
+            <button class="qty-btn" onclick="updateItem('{{ item.key }}',{{ item.quantity }}+1)">+</button>
+          </div>
+        </div>
+        <div>
+          <p class="item-price">{{ item.subtotal }} MAD</p>
+          <button class="remove-btn" onclick="removeItem('{{ item.key }}')">{% if lang == 'ar' %}حذف{% elif lang == 'fr' %}Retirer{% else %}Remove{% endif %}</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="order-summary">
+      <p class="summary-title">{% if lang == 'ar' %}ملخص الطلب{% elif lang == 'fr' %}Résumé{% else %}Order Summary{% endif %}</p>
+      <div class="summary-row"><span>{% if lang == 'ar' %}المجموع{% elif lang == 'fr' %}Sous-total{% else %}Subtotal{% endif %}</span><span>{{ total }} MAD</span></div>
+      <div class="summary-row"><span>{% if lang == 'ar' %}الشحن{% elif lang == 'fr' %}Livraison{% else %}Shipping{% endif %}</span><span>{% if lang == 'ar' %}يُحسب لاحقاً{% elif lang == 'fr' %}À calculer{% else %}TBD{% endif %}</span></div>
+      <div class="summary-row summary-total"><span>{% if lang == 'ar' %}الإجمالي{% elif lang == 'fr' %}Total{% else %}Total{% endif %}</span><span>{{ total }} MAD</span></div>
+      <a href="{% url 'checkout' %}" class="checkout-btn">{% if lang == 'ar' %}متابعة الطلب{% elif lang == 'fr' %}Passer à la Caisse{% else %}Proceed to Checkout{% endif %} →</a>
+      <a href="{% url 'shop' %}" style="display:block;text-align:center;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:16px;text-decoration:none;">{% if lang == 'ar' %}← مواصلة التسوق{% elif lang == 'fr' %}← Continuer mes achats{% else %}← Continue Shopping{% endif %}</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-cart">
+    <h2>{% if lang == 'ar' %}حقيبتك فارغة{% elif lang == 'fr' %}PANIER VIDE{% else %}YOUR BAG IS EMPTY{% endif %}</h2>
+    <p style="color:var(--muted);font-size:13px;letter-spacing:.08em;margin-bottom:40px;">{% if lang == 'ar' %}حان وقت التسوق!{% elif lang == 'fr' %}Il est temps de faire du shopping!{% else %}Time to fill it up.{% endif %}</p>
+    <a href="{% url 'shop' %}" class="btn-primary">{% if lang == 'ar' %}تسوق الآن{% elif lang == 'fr' %}Faire du Shopping{% else %}Shop Now{% endif %}</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateItem(key,qty){fetch('{% url "update_cart" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({key,quantity:qty})}).then(()=>location.reload());}
+function removeItem(key){fetch('{% url "remove_from_cart" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({key})}).then(()=>location.reload());}
+</script>
+{% endblock %}

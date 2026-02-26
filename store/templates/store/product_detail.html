@@ -1,0 +1,158 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+
+{% block title %}{{ product.name_en }} — MOONBLOCK{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-detail{padding-top:100px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;min-height:90vh;}
+.detail-images{position:relative;background:var(--dim);overflow:hidden;}
+.main-image{width:100%;height:100%;min-height:600px;object-fit:cover;display:block;}
+.main-placeholder{width:100%;min-height:600px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1a1520,#0e0d14);}
+.thumbs{position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;}
+.thumb{width:60px;height:72px;object-fit:cover;border:1px solid transparent;cursor:none;transition:border-color .2s;opacity:.6;}
+.thumb:hover,.thumb.active{border-color:var(--moon);opacity:1;}
+.detail-info{padding:80px 60px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto;}
+.detail-category{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--moon);margin-bottom:16px;text-decoration:none;}
+.detail-name{font-family:'Bebas Neue';font-size:clamp(36px,4vw,56px);letter-spacing:.03em;line-height:1;margin-bottom:24px;}
+.detail-price{font-size:28px;color:var(--moon);letter-spacing:.05em;margin-bottom:32px;font-family:'Bebas Neue';}
+.size-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.size-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;}
+.size-btn{width:52px;height:52px;border:1px solid rgba(200,185,154,.2);background:transparent;color:var(--white);font-family:'DM Mono';font-size:12px;cursor:none;transition:all .2s;}
+.size-btn:hover{border-color:var(--moon);color:var(--moon);}
+.size-btn.selected{background:var(--moon);color:var(--black);border-color:var(--moon);}
+.qty-row{display:flex;align-items:center;gap:16px;margin-bottom:24px;}
+.qty-btn{width:44px;height:44px;border:1px solid rgba(200,185,154,.2);background:transparent;color:var(--white);font-size:18px;cursor:none;transition:border-color .2s;}
+.qty-btn:hover{border-color:var(--moon);}
+.qty-val{font-size:18px;letter-spacing:.1em;min-width:32px;text-align:center;}
+.add-btn{width:100%;padding:18px;background:var(--moon);color:var(--black);border:none;font-family:'DM Mono';font-size:13px;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:background .3s;margin-bottom:12px;}
+.add-btn:hover{background:var(--accent);}
+.add-btn:disabled{opacity:.5;}
+.detail-desc{margin-top:40px;padding-top:40px;border-top:1px solid rgba(200,185,154,.1);font-size:13px;line-height:2;color:var(--muted);}
+.detail-meta{margin-top:24px;display:flex;flex-direction:column;gap:8px;}
+.meta-item{display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.1em;color:var(--muted);}
+.meta-icon{color:var(--moon);}
+.related{padding:80px 48px;background:var(--black);}
+.related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:40px;}
+.related-card{position:relative;background:var(--dim);overflow:hidden;cursor:none;}
+.related-img-wrap{aspect-ratio:3/4;overflow:hidden;}
+.related-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
+.related-card:hover .related-img{transform:scale(1.04);}
+.related-info{padding:16px;}
+.related-name{font-family:'Syne';font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px;text-decoration:none;display:block;}
+.related-price{font-size:12px;color:var(--moon);}
+#toast{position:fixed;bottom:32px;right:32px;background:var(--dim);border-left:3px solid var(--moon);padding:16px 24px;font-size:12px;z-index:300;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateY(0);}
+{% if is_rtl %}.detail-info{direction:rtl;}.thumbs{left:auto;right:16px;}.detail-grid{direction:rtl;}#toast{right:auto;left:32px;border-left:none;border-right:3px solid var(--moon);}{% endif %}
+@media(max-width:900px){.detail-grid{grid-template-columns:1fr;}.detail-info{padding:40px 24px;}.related-grid{grid-template-columns:1fr 1fr;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+  <div class="detail-grid">
+    <div class="detail-images">
+      {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name_en }}" class="main-image" id="mainImage">
+      {% if product.image2 or product.image3 %}
+      <div class="thumbs">
+        <img src="{{ product.image.url }}" alt="" class="thumb active" onclick="setImg(this,'{{ product.image.url }}')">
+        {% if product.image2 %}<img src="{{ product.image2.url }}" alt="" class="thumb" onclick="setImg(this,'{{ product.image2.url }}')">{% endif %}
+        {% if product.image3 %}<img src="{{ product.image3.url }}" alt="" class="thumb" onclick="setImg(this,'{{ product.image3.url }}')">{% endif %}
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="main-placeholder">
+        <svg width="140" height="140" viewBox="0 0 120 120" fill="none" opacity=".3">
+          <rect x="20" y="10" width="80" height="100" rx="4" stroke="#C8B99A" stroke-width="1.5"/>
+          <line x1="20" y1="35" x2="100" y2="35" stroke="#C8B99A" stroke-width=".8"/>
+          <circle cx="60" cy="22" r="5" stroke="#C8B99A" stroke-width="1"/>
+          <text x="60" y="75" text-anchor="middle" fill="#C8B99A" font-size="10" font-family="monospace" letter-spacing="2">MOONBLOCK</text>
+        </svg>
+      </div>
+      {% endif %}
+      {% if product.is_new %}<div style="position:absolute;top:24px;left:24px;background:var(--moon);color:var(--black);font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:6px 14px;">{% if lang == 'ar' %}جديد{% elif lang == 'fr' %}NOUVEAU{% else %}NEW{% endif %}</div>{% endif %}
+    </div>
+
+    <div class="detail-info">
+      {% if product.category %}
+      <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="detail-category">← {{ product.category.name|t:lang }}</a>
+      {% endif %}
+      <h1 class="detail-name">{{ product.name|t:lang }}</h1>
+      <p class="detail-price">{{ product.price }} MAD</p>
+
+      {% if product.get_sizes %}
+      <p class="size-label">{% if lang == 'ar' %}اختر المقاس{% elif lang == 'fr' %}Choisir la Taille{% else %}Select Size{% endif %}</p>
+      <div class="size-grid">
+        {% for size in product.get_sizes %}
+        <button class="size-btn" data-size="{{ size }}" onclick="selectSize(this)">{{ size }}</button>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-val" id="qtyVal">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+
+      {% if product.stock > 0 %}
+      <button class="add-btn" onclick="addToCart()">{% if lang == 'ar' %}أضف إلى الحقيبة{% elif lang == 'fr' %}Ajouter au Panier{% else %}Add to Bag{% endif %}</button>
+      {% if product.stock <= 5 %}<p style="font-size:11px;color:var(--moon);text-align:center;letter-spacing:.1em;">{% if lang == 'ar' %}{{ product.stock }} فقط متبقية{% elif lang == 'fr' %}Seulement {{ product.stock }} restants{% else %}Only {{ product.stock }} left{% endif %}</p>{% endif %}
+      {% else %}
+      <button class="add-btn" disabled>{% if lang == 'ar' %}نفد المخزون{% elif lang == 'fr' %}Rupture de Stock{% else %}Out of Stock{% endif %}</button>
+      {% endif %}
+
+      {% if product.description_en or product.description_ar or product.description_fr %}
+      <div class="detail-desc">{{ product.description|t:lang|linebreaks }}</div>
+      {% endif %}
+
+      <div class="detail-meta">
+        <div class="meta-item"><span class="meta-icon">✦</span> {% if lang == 'ar' %}شحن مجاني للطلبات فوق 100 MAD{% elif lang == 'fr' %}Livraison gratuite dès 100 MAD{% else %}Free shipping on orders over 100 MAD{% endif %}</div>
+        <div class="meta-item"><span class="meta-icon">✦</span> {% if lang == 'ar' %}إرجاع خلال 30 يوم{% elif lang == 'fr' %}Retours sous 30 jours{% else %}30-day returns{% endif %}</div>
+        <div class="meta-item"><span class="meta-icon">✦</span> {% if lang == 'ar' %}دفع آمن{% elif lang == 'fr' %}Paiement sécurisé{% else %}Secure checkout{% endif %}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if related %}
+<div class="related reveal" {% if is_rtl %}dir="rtl"{% endif %}>
+  <p class="section-label">{% if lang == 'ar' %}قد يعجبك أيضاً{% elif lang == 'fr' %}Vous aimerez aussi{% else %}You may also like{% endif %}</p>
+  <h2 style="font-family:'Bebas Neue';font-size:clamp(32px,4vw,48px);letter-spacing:.03em;">{% if lang == 'ar' %}ذات صلة{% elif lang == 'fr' %}SIMILAIRES{% else %}RELATED{% endif %}</h2>
+  <div class="related-grid">
+    {% for p in related %}
+    <div class="related-card">
+      <a href="{% url 'product_detail' p.slug %}" style="text-decoration:none;">
+        {% if p.image %}<div class="related-img-wrap"><img src="{{ p.image.url }}" alt="{{ p.name_en }}" class="related-img"></div>
+        {% else %}<div style="aspect-ratio:3/4;background:linear-gradient(160deg,#1a1520,#0e0d14);display:flex;align-items:center;justify-content:center;"><svg width="60" height="60" viewBox="0 0 120 120" fill="none" opacity=".3"><rect x="20" y="10" width="80" height="100" rx="4" stroke="#C8B99A" stroke-width="1.5"/></svg></div>{% endif %}
+        <div class="related-info">
+          <span class="related-name">{{ p.name|t:lang }}</span>
+          <p class="related-price">{{ p.price }} MAD</p>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div id="toast">✦ {% if lang == 'ar' %}تمت الإضافة{% elif lang == 'fr' %}Ajouté au panier{% else %}Added to bag{% endif %}</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const productId={{ product.id }};
+let selectedSize='',qty=1;
+function selectSize(btn){document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedSize=btn.dataset.size;}
+function changeQty(d){qty=Math.max(1,Math.min({{ product.stock }},qty+d));document.getElementById('qtyVal').textContent=qty;}
+function addToCart(){
+  const sizes={{ product.get_sizes|length }};
+  if(sizes>0&&!selectedSize){alert('{% if lang == "ar" %}يرجى اختيار مقاس{% elif lang == "fr" %}Veuillez sélectionner une taille{% else %}Please select a size{% endif %}');return;}
+  fetch('{% url "add_to_cart" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({product_id:productId,size:selectedSize,quantity:qty})})
+  .then(r=>r.json()).then(d=>{if(d.success){updateCartBadge(d.cart_count);const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}});
+}
+function setImg(thumb,url){document.getElementById('mainImage').src=url;document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));thumb.classList.add('active');}
+</script>
+{% endblock %}

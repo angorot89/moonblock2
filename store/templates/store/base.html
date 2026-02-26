@@ -1,0 +1,323 @@
+{% load static moonblock_tags %}
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if is_rtl %}dir="rtl"{% endif %}>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}MOONBLOCK{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #060608;
+  --white: #F2F0EC;
+  --moon: #C8B99A;
+  --accent: #E8D5B0;
+  --dim: #1A1A20;
+  --muted: #6B6870;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:'DM Mono',monospace;cursor:none;overflow-x:hidden;}
+{% if is_rtl %}body{font-family:'DM Mono',monospace,Arial;}{% endif %}
+
+/* Custom Cursor */
+.cursor{width:12px;height:12px;background:var(--moon);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s,width 0.3s,height 0.3s,background 0.3s;}
+.cursor-ring{width:36px;height:36px;border:1px solid var(--moon);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all 0.15s ease;opacity:0.5;}
+body:hover .cursor{opacity:1;}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 48px;display:flex;align-items:center;justify-content:space-between;}
+nav::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,6,8,0.9),transparent);pointer-events:none;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.15em;color:var(--white);text-decoration:none;position:relative;z-index:1;}
+.logo span{color:var(--moon);}
+.nav-links{display:flex;gap:40px;list-style:none;position:relative;z-index:1;}
+.nav-links a{color:var(--white);text-decoration:none;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.7;transition:opacity 0.3s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;color:var(--moon);}
+.nav-right{display:flex;align-items:center;gap:16px;position:relative;z-index:1;}
+.nav-cta{background:var(--moon);color:var(--black);padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;transition:background 0.3s;}
+.nav-cta:hover{background:var(--accent);}
+.cart-link{color:var(--white);text-decoration:none;font-size:11px;letter-spacing:.15em;text-transform:uppercase;display:flex;align-items:center;gap:8px;opacity:.8;transition:opacity .3s;}
+.cart-link:hover{opacity:1;color:var(--moon);}
+.cart-badge{background:var(--moon);color:var(--black);font-size:9px;font-weight:bold;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.auth-link{color:var(--white);text-decoration:none;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.8;transition:opacity .2s,color .2s;}
+.auth-link:hover{opacity:1;color:var(--moon);}
+.user-greeting{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--moon);}
+
+/* Language Switcher */
+.lang-switcher{display:flex;gap:4px;position:relative;z-index:1;}
+.lang-btn{background:transparent;border:1px solid rgba(200,185,154,0.25);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:5px 10px;cursor:none;transition:all 0.2s;text-decoration:none;text-transform:uppercase;}
+.lang-btn:hover,.lang-btn.active{border-color:var(--moon);color:var(--moon);}
+
+/* Ticker */
+.ticker{background:var(--moon);padding:14px 0;overflow:hidden;white-space:nowrap;}
+.ticker-inner{display:inline-flex;animation:ticker 20s linear infinite;gap:0;}
+.ticker-item{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.1em;color:var(--black);padding:0 32px;}
+.ticker-dot{color:var(--black);opacity:0.4;font-size:18px;line-height:1.2;}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* Buttons */
+.btn-primary{background:var(--moon);color:var(--black);padding:16px 40px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;text-decoration:none;transition:background 0.3s,transform 0.2s;display:inline-block;border:none;cursor:none;}
+.btn-primary:hover{background:var(--accent);transform:translateY(-2px);}
+.btn-outline{border:1px solid rgba(200,185,154,.4);color:var(--white);padding:14px 36px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;cursor:none;transition:border-color .3s,color .3s;display:inline-block;background:transparent;}
+.btn-outline:hover{border-color:var(--moon);color:var(--moon);}
+.btn-ghost{color:var(--white);font-size:12px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;opacity:0.6;transition:opacity 0.3s;display:flex;align-items:center;gap:8px;}
+.btn-ghost:hover{opacity:1;}
+.btn-ghost::after{content:'→';}
+{% if is_rtl %}.btn-ghost::after{content:'←';}{% endif %}
+
+/* Section labels */
+.section-label{font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--moon);margin-bottom:12px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.03em;line-height:1;}
+
+/* Messages */
+.messages-container{position:fixed;top:80px;right:24px;z-index:200;display:flex;flex-direction:column;gap:10px;}
+.message{background:var(--dim);border-left:3px solid var(--moon);padding:14px 20px;font-size:12px;letter-spacing:.05em;max-width:300px;animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s ease,transform 0.8s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* Footer */
+footer{background:#030304;padding:80px 48px 40px;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(200,185,154,0.08);}
+.footer-brand .logo{display:block;margin-bottom:20px;}
+.footer-tagline{font-size:12px;color:var(--muted);line-height:1.8;max-width:260px;letter-spacing:0.05em;}
+.footer-col h4{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--moon);margin-bottom:24px;}
+.footer-col ul{list-style:none;}
+.footer-col li{margin-bottom:12px;}
+.footer-col a{color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:0.05em;transition:color .3s;}
+.footer-col a:hover{color:var(--white);}
+.footer-bottom{margin-top:40px;display:flex;align-items:center;justify-content:space-between;}
+.footer-copy{font-size:11px;color:var(--muted);letter-spacing:0.1em;opacity:0.5;}
+.socials{display:flex;gap:24px;}
+.social-link{color:var(--muted);text-decoration:none;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;transition:color .3s;}
+.social-link:hover{color:var(--moon);}
+.social-icon{width:16px;height:16px;display:block;}
+.ai-fab{position:fixed;right:24px;bottom:24px;z-index:220;width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:transform .22s ease,filter .22s ease;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5));}
+.ai-fab:hover{transform:translateY(-3px) scale(1.04);filter:drop-shadow(0 16px 30px rgba(0,0,0,.62));}
+.ai-core{position:relative;width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 22%,#fff4d9 0%,#d6c7aa 36%,#8e7d59 68%,#433927 100%);border:1px solid rgba(255,239,195,.5);}
+.ai-face{position:relative;z-index:2;width:34px;height:34px;border-radius:10px;background:linear-gradient(180deg,#1d1f27 0%,#11131a 100%);border:1px solid rgba(200,185,154,.45);display:flex;align-items:center;justify-content:center;}
+.ai-eye{position:absolute;top:11px;width:6px;height:6px;border-radius:50%;background:#e7d5b1;box-shadow:0 0 6px rgba(231,213,177,.85);}
+.ai-eye.left{left:9px;}
+.ai-eye.right{right:9px;}
+.ai-mouth{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:14px;height:2px;background:rgba(231,213,177,.9);border-radius:2px;}
+.ai-hand{position:absolute;right:8px;top:8px;width:11px;height:11px;border-radius:50% 50% 44% 44%;background:#1d1f27;border:1px solid rgba(200,185,154,.45);transform-origin:2px 9px;animation:aiWave 1.25s ease-in-out infinite;}
+.ai-core::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(6,6,8,.24);}
+.ai-core::after{content:'';position:absolute;top:15px;right:14px;width:7px;height:7px;border-radius:50%;background:#fff7e0;box-shadow:0 0 10px rgba(255,255,255,.8);}
+.ai-orbit{position:absolute;inset:-6px;border-radius:50%;border:1px dashed rgba(200,185,154,.45);animation:orbitSpin 6.5s linear infinite;}
+.ai-dot{position:absolute;top:-3px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--moon);box-shadow:0 0 10px rgba(200,185,154,.75);}
+.ai-bubble{position:fixed;right:102px;bottom:42px;z-index:220;max-width:250px;padding:10px 12px;background:rgba(8,8,12,.95);border:1px solid rgba(200,185,154,.28);color:var(--white);font-size:11px;letter-spacing:.08em;line-height:1.5;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .22s ease,transform .22s ease;}
+.ai-bubble.show{opacity:1;transform:translateY(0);}
+.ai-bubble::after{content:'';position:absolute;right:-6px;bottom:16px;width:10px;height:10px;background:rgba(8,8,12,.95);border-right:1px solid rgba(200,185,154,.28);border-bottom:1px solid rgba(200,185,154,.28);transform:rotate(-45deg);}
+.ai-fab.idle .ai-core{animation:botNudge .8s ease 2;}
+@keyframes botNudge{0%,100%{transform:translateY(0);}25%{transform:translateY(-2px);}75%{transform:translateY(2px);}}
+@keyframes aiWave{0%,100%{transform:rotate(12deg);}50%{transform:rotate(38deg);}}
+@keyframes orbitSpin{to{transform:rotate(360deg);}}
+
+/* RTL adjustments */
+{% if is_rtl %}
+.footer-top{direction:rtl;}
+.nav-links{flex-direction:row-reverse;}
+.footer-bottom{flex-direction:row-reverse;}
+.messages-container{right:auto;left:24px;}
+.message{border-left:none;border-right:3px solid var(--moon);}
+.ai-fab{right:auto;left:24px;}
+.ai-bubble{right:auto;left:102px;}
+.ai-bubble::after{right:auto;left:-6px;border-right:none;border-bottom:none;border-left:1px solid rgba(200,185,154,.28);border-top:1px solid rgba(200,185,154,.28);transform:rotate(-45deg);}
+{% endif %}
+
+@media(max-width:900px){
+  nav{padding:20px 24px;}.nav-links{display:none;}
+  .footer-top{grid-template-columns:1fr 1fr;gap:40px;}
+  .footer-bottom{flex-direction:column;gap:16px;}
+  .ai-fab{width:58px;height:58px;right:16px;bottom:16px;}
+  .ai-core{width:58px;height:58px;}
+  .ai-bubble{right:82px;bottom:26px;max-width:200px;}
+  {% if is_rtl %}.ai-fab{left:16px;right:auto;}{% endif %}
+  {% if is_rtl %}.ai-bubble{left:82px;right:auto;}{% endif %}
+}
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+{% if messages %}
+<div class="messages-container">
+  {% for message in messages %}
+  <div class="message">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Nav -->
+<nav>
+  <a href="{% url 'home' %}" class="logo">MOON<span>BLOCK</span></a>
+  <ul class="nav-links">
+    <li><a href="{% url 'shop' %}" {% if request.resolver_match.url_name == 'shop' %}class="active"{% endif %}>{% site_t site 'nav_shop' lang %}</a></li>
+    <li><a href="{% url 'shop' %}?category=gym">{% site_t site 'nav_gym' lang %}</a></li>
+    <li><a href="{% url 'shop' %}?category=streetwear">{% site_t site 'nav_streetwear' lang %}</a></li>
+    <li><a href="{% url 'lookbook' %}" {% if request.resolver_match.url_name == 'lookbook' %}class="active"{% endif %}>{% site_t site 'nav_lookbook' lang %}</a></li>
+    <li><a href="{% url 'home' %}#about">{% site_t site 'nav_about' lang %}</a></li>
+  </ul>
+  <div class="nav-right">
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+      <a href="{% url 'set_language' 'en' %}" class="lang-btn {% if lang == 'en' %}active{% endif %}">EN</a>
+      <a href="{% url 'set_language' 'ar' %}" class="lang-btn {% if lang == 'ar' %}active{% endif %}">AR</a>
+      <a href="{% url 'set_language' 'fr' %}" class="lang-btn {% if lang == 'fr' %}active{% endif %}">FR</a>
+    </div>
+    {% if request.user.is_authenticated %}
+    <span class="user-greeting">{% if lang == 'ar' %}مرحباً {{ request.user.first_name|default:request.user.username }}{% elif lang == 'fr' %}Salut {{ request.user.first_name|default:request.user.username }}{% else %}Hey {{ request.user.first_name|default:request.user.username }}{% endif %}</span>
+    <a href="{% url 'logout' %}" class="auth-link">{% if lang == 'ar' %}خروج{% elif lang == 'fr' %}Deconnexion{% else %}Logout{% endif %}</a>
+    {% else %}
+    <a href="{% url 'login' %}" class="auth-link">{% if lang == 'ar' %}دخول{% elif lang == 'fr' %}Connexion{% else %}Login{% endif %}</a>
+    <a href="{% url 'register' %}" class="auth-link">{% if lang == 'ar' %}تسجيل{% elif lang == 'fr' %}Inscription{% else %}Register{% endif %}</a>
+    {% endif %}
+    <a href="{% url 'cart' %}" class="cart-link">
+      {% if lang == 'ar' %}حقيبة{% elif lang == 'fr' %}Sac{% else %}Bag{% endif %}
+      <span class="cart-badge" id="cartBadge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span>
+    </a>
+    <a href="{% url 'shop' %}" class="nav-cta">{% site_t site 'nav_shopnow' lang %}</a>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<!-- Ticker -->
+{% block ticker %}
+<div class="ticker">
+  <div class="ticker-inner">
+    {% site_t site 'ticker_items' lang as ticker_raw %}
+    {% with items=ticker_raw|split:',' %}
+    {% for item in items %}<span class="ticker-item">{{ item }}</span><span class="ticker-dot">✦</span>{% endfor %}
+    {% for item in items %}<span class="ticker-item">{{ item }}</span><span class="ticker-dot">✦</span>{% endfor %}
+    {% endwith %}
+  </div>
+</div>
+{% endblock %}
+
+<!-- Newsletter -->
+<div style="background:var(--moon);color:var(--black);text-align:center;padding:100px 48px;" class="reveal" {% if is_rtl %}dir="rtl"{% endif %}>
+  <p style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(6,6,8,.5);margin-bottom:12px;">{% site_t site 'newsletter_label' lang %}</p>
+  <h2 style="font-family:'Bebas Neue';font-size:clamp(40px,6vw,72px);letter-spacing:.03em;color:var(--black);margin-bottom:16px;">{% site_t site 'newsletter_title' lang %}</h2>
+  <p style="font-size:13px;letter-spacing:.08em;opacity:.6;margin-bottom:40px;">{% site_t site 'newsletter_sub' lang %}</p>
+  <form method="post" action="{% url 'newsletter_subscribe' %}" style="display:flex;max-width:480px;margin:0 auto;">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="your@email.com" required
+      style="flex:1;background:rgba(6,6,8,.12);border:1px solid rgba(6,6,8,.2);color:var(--black);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.1em;padding:16px 20px;outline:none;">
+    <button type="submit" style="background:var(--black);color:var(--moon);border:none;padding:16px 32px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:background .3s;">
+      {% if lang == 'ar' %}اشترك{% elif lang == 'fr' %}S'abonner{% else %}Subscribe{% endif %}
+    </button>
+  </form>
+</div>
+
+<!-- Footer -->
+<footer {% if is_rtl %}dir="rtl"{% endif %}>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="{% url 'home' %}" class="logo">MOON<span>BLOCK</span></a>
+      <p class="footer-tagline">{% site_t site 'footer_tagline' lang %}</p>
+      <div class="socials" style="margin-top:32px;">
+        <a href="{{ site.instagram_url }}" class="social-link" aria-label="Instagram">
+          <svg class="social-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="17.6" cy="6.6" r="1.1" fill="currentColor"/>
+          </svg>
+        </a>
+        <a href="{{ site.tiktok_url }}" class="social-link">TK</a>
+        <a href="{{ site.twitter_url }}" class="social-link">X</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>{% if lang == 'ar' %}تسوق{% elif lang == 'fr' %}Boutique{% else %}Shop{% endif %}</h4>
+      <ul>
+        <li><a href="{% url 'shop' %}">{% if lang == 'ar' %}كل المنتجات{% elif lang == 'fr' %}Tous les Produits{% else %}All Products{% endif %}</a></li>
+        {% for cat in all_categories %}
+        <li><a href="{% url 'shop' %}?category={{ cat.slug }}">{{ cat.name_en }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>{% if lang == 'ar' %}العلامة{% elif lang == 'fr' %}Marque{% else %}Brand{% endif %}</h4>
+      <ul>
+        <li><a href="{% url 'home' %}#about">{% site_t site 'nav_about' lang %}</a></li>
+        <li><a href="{% url 'lookbook' %}">{% site_t site 'nav_lookbook' lang %}</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>{% if lang == 'ar' %}دعم{% elif lang == 'fr' %}Support{% else %}Support{% endif %}</h4>
+      <ul>
+        <li><a href="{% url 'sizing_guide' %}?mode=sizing">{% if lang == 'ar' %}دليل المقاسات{% elif lang == 'fr' %}Guide des Tailles{% else %}Sizing Guide{% endif %}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Moonblock. {% if lang == 'ar' %}جميع الحقوق محفوظة.{% elif lang == 'fr' %}Tous droits réservés.{% else %}All rights reserved.{% endif %}</p>
+    <p class="footer-copy">Privacy · Terms</p>
+  </div>
+</footer>
+<a href="{% url 'sizing_guide' %}" class="ai-fab" aria-label="{% if lang == 'ar' %}مساعد الذكاء الاصطناعي{% elif lang == 'fr' %}Assistant IA{% else %}AI Assistant{% endif %}">
+  <span class="ai-core">
+    <span class="ai-face">
+      <span class="ai-eye left"></span>
+      <span class="ai-eye right"></span>
+      <span class="ai-mouth"></span>
+    </span>
+    <span class="ai-hand"></span>
+    <span class="ai-orbit"><span class="ai-dot"></span></span>
+  </span>
+</a>
+<div class="ai-bubble" id="aiBubble">{% if lang == 'ar' %}أخبرني إذا كنت تحتاج أي مساعدة.{% elif lang == 'fr' %}Dites-moi si vous avez besoin d'aide.{% else %}Let me know if you need assistance.{% endif %}</div>
+
+<script>
+// Cursor
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}
+animRing();
+document.querySelectorAll('a,button,.product-card,.cat-item,.ai-fab').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.width='20px';cursor.style.height='20px';ring.style.width='56px';ring.style.height='56px';});
+  el.addEventListener('mouseleave',()=>{cursor.style.width='12px';cursor.style.height='12px';ring.style.width='36px';ring.style.height='36px';});
+});
+// Reveal
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(r=>io.observe(r));
+// Messages auto-hide
+setTimeout(()=>document.querySelectorAll('.message').forEach(m=>m.style.opacity='0'),4000);
+// Cart badge
+function updateCartBadge(count){const b=document.getElementById('cartBadge');if(b){b.textContent=count;b.style.display=count>0?'flex':'none';}}
+// AI avatar prompt on hover + idle
+const aiFab=document.querySelector('.ai-fab');
+const aiBubble=document.getElementById('aiBubble');
+let aiIdleTimer=null;
+function showAiBubble(ms=2800){
+  if(!aiBubble)return;
+  aiBubble.classList.add('show');
+  clearTimeout(aiBubble._hideTimer);
+  aiBubble._hideTimer=setTimeout(()=>aiBubble.classList.remove('show'),ms);
+}
+function startAiIdleTimer(){
+  clearTimeout(aiIdleTimer);
+  aiIdleTimer=setTimeout(()=>{
+    if(aiFab){aiFab.classList.add('idle');setTimeout(()=>aiFab.classList.remove('idle'),1200);}
+    showAiBubble(3400);
+  },7000);
+}
+if(aiFab){
+  aiFab.addEventListener('mouseenter',()=>showAiBubble(2600));
+  aiFab.addEventListener('focus',()=>showAiBubble(2600));
+}
+['mousemove','scroll','keydown','touchstart','click'].forEach(evt=>window.addEventListener(evt,startAiIdleTimer,{passive:true}));
+startAiIdleTimer();
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

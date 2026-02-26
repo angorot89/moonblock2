@@ -1,0 +1,82 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+
+{% block title %}{% if lang == 'ar' %}تسوق{% elif lang == 'fr' %}Boutique{% else %}Shop{% endif %} — MOONBLOCK{% endblock %}
+
+{% block extra_css %}
+<style>
+.shop-header{padding:140px 48px 60px;border-bottom:1px solid rgba(200,185,154,.1);}
+.filter-bar{display:flex;align-items:center;gap:20px;padding:20px 48px;background:var(--dim);border-bottom:1px solid rgba(200,185,154,.06);flex-wrap:wrap;}
+.filter-label{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);}
+.filter-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 16px;border:1px solid transparent;transition:all .2s;cursor:none;}
+.filter-btn:hover,.filter-btn.active{color:var(--moon);border-color:rgba(200,185,154,.3);}
+.sort-select{margin-left:auto;background:transparent;border:1px solid rgba(200,185,154,.2);color:var(--white);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;padding:8px 16px;cursor:none;outline:none;}
+.sort-select option{background:var(--dim);}
+.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px 0;}
+.product-card{position:relative;background:var(--dim);overflow:hidden;cursor:none;}
+.product-img-wrap{overflow:hidden;aspect-ratio:3/4;position:relative;}
+.product-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease;}
+.product-card:hover .product-img{transform:scale(1.04);}
+.product-placeholder{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:var(--dim);}
+.product-overlay{position:absolute;bottom:0;left:0;right:0;padding:24px;background:linear-gradient(to top,rgba(6,6,8,.95),transparent);transform:translateY(8px);transition:transform .3s;}
+.product-card:hover .product-overlay{transform:translateY(0);}
+.product-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;letter-spacing:.02em;margin-bottom:4px;color:var(--white);}
+.product-price{font-size:12px;color:var(--moon);letter-spacing:.1em;}
+.product-tag{position:absolute;top:16px;left:16px;background:var(--moon);color:var(--black);font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:4px 10px;z-index:2;}
+.empty-state{padding:120px 48px;text-align:center;color:var(--muted);}
+.empty-state h3{font-family:'Bebas Neue';font-size:48px;letter-spacing:.05em;color:var(--white);margin-bottom:16px;}
+{% if is_rtl %}.shop-header,.filter-bar{direction:rtl;}.sort-select{margin-left:0;margin-right:auto;}.product-tag{left:auto;right:16px;}{% endif %}
+@media(max-width:900px){.shop-header{padding:120px 24px 40px;}.filter-bar{padding:16px 24px;}.shop-grid{grid-template-columns:1fr 1fr;}.sort-select{margin-left:0;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="shop-header" {% if is_rtl %}dir="rtl"{% endif %}>
+  <p class="section-label">{% if selected_category %}{{ selected_category.name|t:lang }}{% elif lang == 'ar' %}كل المنتجات{% elif lang == 'fr' %}Tous les Produits{% else %}All Products{% endif %}</p>
+  <h1 class="section-title" style="font-size:clamp(48px,7vw,80px);">{% if selected_category %}{{ selected_category.name|t:lang }}{% elif lang == 'ar' %}تسوق الكل{% elif lang == 'fr' %}BOUTIQUE{% else %}SHOP ALL{% endif %}</h1>
+  {% if products %}<p style="color:var(--muted);font-size:12px;letter-spacing:.1em;margin-top:12px;">{{ products.count }} {% if lang == 'ar' %}منتج{% elif lang == 'fr' %}produit(s){% else %}product(s){% endif %}</p>{% endif %}
+</div>
+
+<div class="filter-bar" {% if is_rtl %}dir="rtl"{% endif %}>
+  <span class="filter-label">{% if lang == 'ar' %}تصفية:{% elif lang == 'fr' %}Filtrer:{% else %}Filter:{% endif %}</span>
+  <a href="{% url 'shop' %}{% if sort %}?sort={{ sort }}{% endif %}" class="filter-btn {% if not selected_category %}active{% endif %}">{% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tout{% else %}All{% endif %}</a>
+  {% for cat in all_categories %}
+  <a href="{% url 'shop' %}?category={{ cat.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="filter-btn {% if selected_category.slug == cat.slug %}active{% endif %}">{{ cat.name|t:lang }}</a>
+  {% endfor %}
+  <select class="sort-select" onchange="location='?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort='+this.value">
+    <option value="new" {% if sort == 'new' %}selected{% endif %}>{% if lang == 'ar' %}الأحدث{% elif lang == 'fr' %}Nouveautés{% else %}Newest{% endif %}</option>
+    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأقل{% elif lang == 'fr' %}Prix croissant{% else %}Price: Low to High{% endif %}</option>
+    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأعلى{% elif lang == 'fr' %}Prix décroissant{% else %}Price: High to Low{% endif %}</option>
+    <option value="name" {% if sort == 'name' %}selected{% endif %}>{% if lang == 'ar' %}الاسم{% elif lang == 'fr' %}Nom A-Z{% else %}Name A-Z{% endif %}</option>
+  </select>
+</div>
+
+{% if products %}
+<div class="shop-grid">
+  {% for product in products %}
+  <div class="product-card reveal">
+    {% if product.is_new %}<span class="product-tag">{% if lang == 'ar' %}جديد{% elif lang == 'fr' %}NOUVEAU{% else %}NEW{% endif %}</span>{% endif %}
+    <a href="{% url 'product_detail' product.slug %}" style="text-decoration:none;display:block;">
+      {% if product.image %}
+      <div class="product-img-wrap"><img src="{{ product.image.url }}" alt="{{ product.name_en }}" class="product-img"></div>
+      {% else %}
+      <div class="product-placeholder" style="background:linear-gradient(160deg,#1a1520,#0e0d14);">
+        <svg width="80" height="80" viewBox="0 0 120 120" fill="none" opacity=".4"><rect x="20" y="10" width="80" height="100" rx="4" stroke="#C8B99A" stroke-width="1.5"/><line x1="20" y1="35" x2="100" y2="35" stroke="#C8B99A" stroke-width=".8"/></svg>
+      </div>
+      {% endif %}
+      <div class="product-overlay">
+        <p class="product-name">{{ product.name|t:lang }}</p>
+        <p class="product-price">{{ product.price }} MAD</p>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <h3>{% if lang == 'ar' %}لا توجد منتجات{% elif lang == 'fr' %}AUCUN PRODUIT{% else %}NO PRODUCTS YET{% endif %}</h3>
+  <p style="font-size:13px;letter-spacing:.08em;margin-bottom:40px;">{% if lang == 'ar' %}أضف منتجات من لوحة الإدارة{% elif lang == 'fr' %}Ajoutez des produits dans le panneau d'administration{% else %}Add products in the admin panel{% endif %}.</p>
+  <a href="/admin/store/product/add/" class="btn-primary">{% if lang == 'ar' %}إضافة منتج{% elif lang == 'fr' %}Ajouter un Produit{% else %}Add Product{% endif %}</a>
+</div>
+{% endif %}
+{% endblock %}

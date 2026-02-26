@@ -1,0 +1,86 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+
+{% block title %}{% if lang == 'ar' %}الدفع{% elif lang == 'fr' %}Commander{% else %}Checkout{% endif %} — MOONBLOCK{% endblock %}
+
+{% block extra_css %}
+<style>
+.checkout-page{padding:140px 48px 80px;max-width:1100px;margin:0 auto;}
+.checkout-grid{display:grid;grid-template-columns:1fr 380px;gap:60px;}
+.checkout-title{font-family:'Bebas Neue';font-size:clamp(48px,7vw,80px);letter-spacing:.03em;margin-bottom:60px;}
+.fs-title{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--moon);margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(200,185,154,.1);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;}
+.form-input{width:100%;background:var(--dim);border:1px solid rgba(200,185,154,.15);color:var(--white);font-family:'DM Mono';font-size:13px;padding:14px 16px;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--moon);}
+.form-input::placeholder{color:var(--muted);}
+.submit-btn{width:100%;padding:18px;background:var(--moon);color:var(--black);border:none;font-family:'DM Mono';font-size:13px;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:background .3s;}
+.submit-btn:hover{background:var(--accent);}
+.order-box{background:var(--dim);padding:32px;}
+.order-box-title{font-family:'Bebas Neue';font-size:24px;letter-spacing:.05em;margin-bottom:24px;border-bottom:1px solid rgba(200,185,154,.1);padding-bottom:16px;}
+.order-item{display:flex;align-items:center;gap:16px;margin-bottom:16px;font-size:12px;}
+.order-img{width:56px;height:68px;object-fit:cover;flex-shrink:0;}
+.order-ph{width:56px;height:68px;background:#1a1520;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.order-name{flex:1;color:var(--white);}
+.order-meta{font-size:10px;color:var(--muted);margin-top:2px;}
+.order-price{color:var(--moon);white-space:nowrap;}
+hr.div{border:none;border-top:1px solid rgba(200,185,154,.1);margin:20px 0;}
+.order-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px;}
+.order-total{font-family:'Bebas Neue';font-size:22px;color:var(--moon);}
+{% if is_rtl %}.checkout-page,.checkout-grid{direction:rtl;}.form-input{text-align:right;}{% endif %}
+@media(max-width:900px){.checkout-page{padding:120px 20px 60px;}.checkout-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-page" {% if is_rtl %}dir="rtl"{% endif %}>
+  <h1 class="checkout-title">{% if lang == 'ar' %}الدفع{% elif lang == 'fr' %}COMMANDER{% else %}CHECKOUT{% endif %}</h1>
+  <div class="checkout-grid">
+    <form method="post">
+      {% csrf_token %}
+      <div style="margin-bottom:40px;">
+        <p class="fs-title">{% if lang == 'ar' %}معلومات التواصل{% elif lang == 'fr' %}Informations de Contact{% else %}Contact Information{% endif %}</p>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">{% if lang == 'ar' %}الاسم الأول{% elif lang == 'fr' %}Prénom{% else %}First Name{% endif %} *</label><input type="text" name="first_name" class="form-input" required></div>
+          <div class="form-group"><label class="form-label">{% if lang == 'ar' %}اسم العائلة{% elif lang == 'fr' %}Nom{% else %}Last Name{% endif %} *</label><input type="text" name="last_name" class="form-input" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">{% if lang == 'ar' %}البريد الإلكتروني{% elif lang == 'fr' %}E-mail{% else %}Email{% endif %} *</label><input type="email" name="email" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">{% if lang == 'ar' %}الهاتف{% elif lang == 'fr' %}Téléphone{% else %}Phone{% endif %}</label><input type="tel" name="phone" class="form-input"></div>
+      </div>
+      <div style="margin-bottom:40px;">
+        <p class="fs-title">{% if lang == 'ar' %}عنوان الشحن{% elif lang == 'fr' %}Adresse de Livraison{% else %}Shipping Address{% endif %}</p>
+        <div class="form-group"><label class="form-label">{% if lang == 'ar' %}العنوان{% elif lang == 'fr' %}Adresse{% else %}Address{% endif %} *</label><input type="text" name="address" class="form-input" required></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">{% if lang == 'ar' %}المدينة{% elif lang == 'fr' %}Ville{% else %}City{% endif %} *</label><input type="text" name="city" class="form-input" required></div>
+          <div class="form-group"><label class="form-label">{% if lang == 'ar' %}الرمز البريدي{% elif lang == 'fr' %}Code Postal{% else %}Postal Code{% endif %} *</label><input type="text" name="postal_code" class="form-input" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">{% if lang == 'ar' %}الدولة{% elif lang == 'fr' %}Pays{% else %}Country{% endif %}</label><input type="text" name="country" class="form-input"></div>
+      </div>
+      <div style="margin-bottom:32px;">
+        <p class="fs-title">{% if lang == 'ar' %}ملاحظات{% elif lang == 'fr' %}Notes{% else %}Order Notes{% endif %}</p>
+        <textarea name="notes" class="form-input" rows="3" placeholder="{% if lang == 'ar' %}تعليمات خاصة...{% elif lang == 'fr' %}Instructions spéciales...{% else %}Any special instructions...{% endif %}"></textarea>
+      </div>
+      <button type="submit" class="submit-btn">{% if lang == 'ar' %}تأكيد الطلب{% elif lang == 'fr' %}Passer la Commande{% else %}Place Order{% endif %} →</button>
+    </form>
+
+    <div>
+      <div class="order-box">
+        <p class="order-box-title">{% if lang == 'ar' %}طلبك{% elif lang == 'fr' %}Votre Commande{% else %}Your Order{% endif %}</p>
+        {% for item in items %}
+        <div class="order-item">
+          {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="" class="order-img">
+          {% else %}<div class="order-ph"><svg width="24" height="24" viewBox="0 0 120 120" fill="none" opacity=".4"><rect x="20" y="10" width="80" height="100" rx="4" stroke="#C8B99A" stroke-width="2"/></svg></div>{% endif %}
+          <div class="order-name">{{ item.product.name|t:lang }}<p class="order-meta">x{{ item.quantity }}{% if item.size %} · {{ item.size }}{% endif %}</p></div>
+          <span class="order-price">{{ item.subtotal }} MAD</span>
+        </div>
+        {% endfor %}
+        <hr class="div">
+        <div class="order-row"><span>{% if lang == 'ar' %}المجموع{% elif lang == 'fr' %}Sous-total{% else %}Subtotal{% endif %}</span><span>{{ total }} MAD</span></div>
+        <hr class="div">
+        <div class="order-row"><span class="order-total">{% if lang == 'ar' %}الإجمالي{% elif lang == 'fr' %}Total{% else %}Total{% endif %}</span><span class="order-total">{{ total }} MAD</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

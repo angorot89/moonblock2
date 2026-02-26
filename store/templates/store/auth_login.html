@@ -1,0 +1,50 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+
+{% block title %}{% if lang == 'ar' %}تسجيل الدخول{% elif lang == 'fr' %}Connexion{% else %}Login{% endif %} — MOONBLOCK{% endblock %}
+
+{% block ticker %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-page{min-height:100vh;padding:140px 24px 80px;display:flex;align-items:flex-start;justify-content:center;}
+.auth-card{width:min(460px,100%);background:var(--dim);padding:32px;border:1px solid rgba(200,185,154,.14);}
+.auth-title{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:.04em;margin-bottom:10px;}
+.auth-sub{font-size:12px;color:var(--muted);margin-bottom:24px;letter-spacing:.08em;}
+.auth-field{margin-bottom:14px;}
+.auth-input{width:100%;background:transparent;border:1px solid rgba(200,185,154,.25);color:var(--white);padding:12px 14px;font-size:13px;outline:none;}
+.auth-input:focus{border-color:var(--moon);}
+.auth-btn{width:100%;padding:14px;border:none;background:var(--moon);color:var(--black);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;cursor:none;}
+.auth-errors{margin-bottom:14px;color:#ffb0b0;font-size:12px;line-height:1.6;}
+.auth-foot{margin-top:18px;font-size:12px;color:var(--muted);}
+.auth-foot a{color:var(--moon);text-decoration:none;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page" {% if is_rtl %}dir="rtl"{% endif %}>
+  <div class="auth-card reveal">
+    <h1 class="auth-title">{% if lang == 'ar' %}تسجيل الدخول{% elif lang == 'fr' %}Connexion{% else %}Login{% endif %}</h1>
+    <p class="auth-sub">{% if lang == 'ar' %}سجّل دخولك أو تابع كضيف{% elif lang == 'fr' %}Connectez-vous ou continuez en invite{% else %}Sign in or continue as guest{% endif %}</p>
+    {% if form.errors %}
+    <div class="auth-errors">
+      {% for field in form %}{% for error in field.errors %}<div>{{ error }}</div>{% endfor %}{% endfor %}
+      {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="auth-field">
+        <input class="auth-input" name="username" type="text" required placeholder="{% if lang == 'ar' %}اسم المستخدم{% elif lang == 'fr' %}Nom utilisateur{% else %}Username{% endif %}">
+      </div>
+      <div class="auth-field">
+        <input class="auth-input" name="password" type="password" required placeholder="{% if lang == 'ar' %}كلمة المرور{% elif lang == 'fr' %}Mot de passe{% else %}Password{% endif %}">
+      </div>
+      <button type="submit" class="auth-btn">{% if lang == 'ar' %}دخول{% elif lang == 'fr' %}Connexion{% else %}Login{% endif %}</button>
+    </form>
+    <p class="auth-foot">{% if lang == 'ar' %}ما عندك حساب؟{% elif lang == 'fr' %}Pas de compte?{% else %}No account yet?{% endif %} <a href="{% url 'register' %}">{% if lang == 'ar' %}أنشئ حساب{% elif lang == 'fr' %}Inscrivez-vous{% else %}Register{% endif %}</a></p>
+    <p class="auth-foot"><a href="{% url 'skip_auth' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% if lang == 'ar' %}تخطي الآن{% elif lang == 'fr' %}Passer pour le moment{% else %}Skip for now{% endif %}</a></p>
+  </div>
+</div>
+{% endblock %}

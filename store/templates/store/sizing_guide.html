@@ -1,0 +1,232 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+
+{% block title %}{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% else %}MOONBLOCK AI Assistant{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.ai-page{padding-top:120px;padding-bottom:90px;max-width:980px;margin:0 auto;padding-left:24px;padding-right:24px;}
+.ai-shell{border:1px solid rgba(200,185,154,.2);background:linear-gradient(180deg,#0e0f14 0%,#08090d 100%);box-shadow:0 18px 40px rgba(0,0,0,.45);}
+.ai-head{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid rgba(200,185,154,.12);}
+.ai-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 24%,#fff2d2 0%,#c8b99a 36%,#907b52 100%);color:#050507;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.08em;}
+.ai-name{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--moon);}
+.ai-state{font-size:11px;color:var(--muted);letter-spacing:.08em;}
+.chat-log{height:460px;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
+.msg{max-width:min(82%,680px);padding:12px 14px;font-size:13px;line-height:1.7;letter-spacing:.02em;word-break:break-word;}
+.msg.bot{align-self:flex-start;border:1px solid rgba(200,185,154,.2);background:rgba(200,185,154,.08);}
+.msg.user{align-self:flex-end;background:var(--moon);color:#060608;}
+.quick-row{padding:0 20px 12px;display:flex;flex-wrap:wrap;gap:8px;}
+.quick-btn{border:1px solid rgba(200,185,154,.24);background:transparent;color:var(--moon);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:8px 10px;cursor:none;}
+.chat-input-wrap{display:grid;grid-template-columns:1fr auto;gap:10px;padding:16px 20px 20px;border-top:1px solid rgba(200,185,154,.12);}
+.chat-input{background:transparent;border:1px solid rgba(200,185,154,.22);color:var(--white);padding:12px 14px;font-size:13px;outline:none;}
+.chat-input:focus{border-color:var(--moon);}
+.send-btn{background:var(--moon);border:none;color:#060608;padding:12px 18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:none;}
+@media(max-width:900px){.chat-log{height:52vh;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ai-page reveal" {% if is_rtl %}dir="rtl"{% endif %}>
+  <div class="ai-shell">
+    <div class="ai-head">
+      <div class="ai-avatar">AI</div>
+      <div>
+        <p class="ai-name">{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% else %}Moonblock Assistant{% endif %}</p>
+        <p class="ai-state">{% if lang == 'ar' %}مساعدة المقاس + التسوق + الحسابات{% elif lang == 'fr' %}Tailles + shopping + calculs{% else %}Sizing + shopping + calculations{% endif %}</p>
+      </div>
+    </div>
+
+    <div id="chatLog" class="chat-log"></div>
+
+    <div class="quick-row">
+      <button class="quick-btn" data-q="{% if lang == 'ar' %}أريد مساعدة مقاس، طولي 178 سم ووزني 74 كغ{% elif lang == 'fr' %}J'ai besoin d'aide taille, je fais 178 cm et 74 kg{% else %}I need size help, my height is 178 cm and weight is 74 kg{% endif %}">{% if lang == 'ar' %}مقاس{% elif lang == 'fr' %}Taille{% else %}Size Help{% endif %}</button>
+      <button class="quick-btn" data-q="{% if lang == 'ar' %}خذني إلى منتجات الجيم{% elif lang == 'fr' %}Emmene-moi vers les produits gym{% else %}Take me to gym products{% endif %}">{% if lang == 'ar' %}تسوق الجيم{% elif lang == 'fr' %}Shop Gym{% else %}Shop Gym{% endif %}</button>
+      <button class="quick-btn" data-q="calc 1299*3">{% if lang == 'ar' %}آلة حاسبة{% elif lang == 'fr' %}Calculatrice{% else %}Calculator{% endif %}</button>
+      <button class="quick-btn" data-q="{% if lang == 'ar' %}كيف أُكمل الدفع؟{% elif lang == 'fr' %}Comment passer au paiement ?{% else %}How do I checkout?{% endif %}">{% if lang == 'ar' %}الدفع{% elif lang == 'fr' %}Paiement{% else %}Checkout{% endif %}</button>
+    </div>
+
+    <form id="chatForm" class="chat-input-wrap">
+      <input id="chatInput" class="chat-input" autocomplete="off" placeholder="{% if lang == 'ar' %}اكتب رسالتك...{% elif lang == 'fr' %}Ecrivez votre message...{% else %}Type your message...{% endif %}">
+      <button class="send-btn" type="submit">{% if lang == 'ar' %}إرسال{% elif lang == 'fr' %}Envoyer{% else %}Send{% endif %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const chatLog=document.getElementById('chatLog');
+const chatForm=document.getElementById('chatForm');
+const chatInput=document.getElementById('chatInput');
+const quickBtns=document.querySelectorAll('.quick-btn');
+const mode='{{ assistant_mode|default:"" }}';
+const lang='{{ lang }}';
+
+const t={
+  en:{
+    askStats:'Send your <strong>height (cm)</strong> and <strong>weight (kg)</strong>, for example: <em>178 cm, 74 kg, regular fit</em>.',
+    sizeReply:(rec)=>`Recommended: <strong>${rec.main}</strong>.<br>Comfort option: <strong>${rec.alt}</strong>.<br>BMI: ${rec.bmi}.`,
+    gym:'Go here: <a href="/shop/?category=gym">Gym Collection</a>.',
+    street:'Go here: <a href="/shop/?category=streetwear">Streetwear</a>.',
+    checkout:'Checkout link: <a href="/checkout/">Proceed to Checkout</a>.',
+    cart:'Open your bag here: <a href="/cart/">Cart</a>.',
+    lookbook:'Explore style ideas here: <a href="/lookbook/">Lookbook</a>.',
+    shop:'Start shopping: <a href="/shop/">Shop All</a>. You can ask me "gym", "streetwear", or "size help".',
+    fallback:'I can help with sizing, store navigation, and calculations. Try: <em>178 cm 74 kg regular</em> or <em>calc 1299*3</em>.',
+    sizingInit:'Sizing mode is ready. Send your height and weight to get your fit recommendation.',
+    init:'Hi, I am your MOONBLOCK AI assistant. I can help you find products, pick sizes, and calculate totals.'
+  },
+  ar:{
+    askStats:'أرسل <strong>الطول (سم)</strong> و<strong>الوزن (كغ)</strong> مثل: <em>178 سم، 74 كغ، مقاس عادي</em>.',
+    sizeReply:(rec)=>`المقاس المقترح: <strong>${rec.main}</strong>.<br>خيار أريح: <strong>${rec.alt}</strong>.<br>BMI: ${rec.bmi}.`,
+    gym:'اذهب إلى: <a href="/shop/?category=gym">قسم الجيم</a>.',
+    street:'اذهب إلى: <a href="/shop/?category=streetwear">قسم ستريت وير</a>.',
+    checkout:'رابط الدفع: <a href="/checkout/">إتمام الطلب</a>.',
+    cart:'افتح حقيبتك من هنا: <a href="/cart/">الحقيبة</a>.',
+    lookbook:'شاهد الإلهام من هنا: <a href="/lookbook/">اللوكبوك</a>.',
+    shop:'ابدأ التسوق: <a href="/shop/">كل المنتجات</a>. يمكنك أن تطلب جيم أو ستريت وير أو مساعدة مقاس.',
+    fallback:'أقدر أساعدك في المقاسات، التنقل داخل المتجر، والحسابات. جرّب: <em>178 سم 74 كغ عادي</em> أو <em>calc 1299*3</em>.',
+    sizingInit:'وضع المقاسات جاهز. أرسل الطول والوزن لتحصل على المقاس المناسب.',
+    init:'مرحباً، أنا مساعد MOONBLOCK الذكي. أساعدك في المقاسات، التسوق، والحسابات.'
+  },
+  fr:{
+    askStats:'Envoyez votre <strong>taille (cm)</strong> et votre <strong>poids (kg)</strong>, par exemple: <em>178 cm, 74 kg, coupe regular</em>.',
+    sizeReply:(rec)=>`Taille recommandee: <strong>${rec.main}</strong>.<br>Option plus ample: <strong>${rec.alt}</strong>.<br>IMC: ${rec.bmi}.`,
+    gym:'Allez ici: <a href="/shop/?category=gym">Collection Gym</a>.',
+    street:'Allez ici: <a href="/shop/?category=streetwear">Streetwear</a>.',
+    checkout:'Lien de paiement: <a href="/checkout/">Passer a la caisse</a>.',
+    cart:'Ouvrez votre panier ici: <a href="/cart/">Panier</a>.',
+    lookbook:'Inspiration ici: <a href="/lookbook/">Lookbook</a>.',
+    shop:'Commencez ici: <a href="/shop/">Shop All</a>. Vous pouvez demander gym, streetwear, ou aide taille.',
+    fallback:'Je peux aider pour les tailles, la navigation et les calculs. Essayez: <em>178 cm 74 kg regular</em> ou <em>calc 1299*3</em>.',
+    sizingInit:'Mode taille actif. Envoyez votre taille et votre poids pour une recommandation.',
+    init:'Bonjour, je suis votre assistant IA MOONBLOCK. Je peux aider pour le shopping, les tailles et les calculs.'
+  }
+};
+const tr=t[lang]||t.en;
+
+function addMsg(text,role='bot'){
+  const el=document.createElement('div');
+  el.className=`msg ${role}`;
+  el.innerHTML=text;
+  chatLog.appendChild(el);
+  chatLog.scrollTop=chatLog.scrollHeight;
+}
+
+function recommendSize(heightCm,weightKg,fit){
+  const bmi=weightKg/((heightCm/100)**2);
+  const sizes=['XS','S','M','L','XL','XXL'];
+  let idx=1;
+  if(heightCm>=165&&heightCm<173)idx=2;
+  else if(heightCm>=173&&heightCm<181)idx=3;
+  else if(heightCm>=181&&heightCm<188)idx=4;
+  else if(heightCm>=188)idx=5;
+  if(bmi<19)idx-=1;
+  else if(bmi>31)idx+=2;
+  else if(bmi>27)idx+=1;
+  if(fit==='slim')idx-=1;
+  if(fit==='oversized')idx+=1;
+  idx=Math.max(0,Math.min(sizes.length-1,idx));
+  const main=sizes[idx];
+  const alt=sizes[Math.min(idx+1,sizes.length-1)];
+  return {main,alt,bmi:Math.round(bmi*10)/10};
+}
+
+function parseFit(msg){
+  if(msg.includes('slim')||msg.includes('ضيق')||msg.includes('ajuste'))return 'slim';
+  if(msg.includes('oversize')||msg.includes('oversized')||msg.includes('واسع')||msg.includes('ample'))return 'oversized';
+  return 'regular';
+}
+
+function parseNumbers(msg){
+  const nums=(msg.match(/\d+(\.\d+)?/g)||[]).map(Number);
+  if(nums.length<2)return null;
+  const [a,b]=nums;
+  const height=Math.max(a,b)>120?Math.max(a,b):null;
+  const weight=Math.min(a,b)<120?Math.min(a,b):null;
+  if(!height||!weight)return null;
+  return {height,weight};
+}
+
+function tryCalc(msg){
+  const raw=msg.replace(/^calc\s*/,'').replace(/[^0-9+\-*/().% ]/g,'').trim();
+  if(!raw)return null;
+  if(!/^[0-9+\-*/().% ]+$/.test(raw))return null;
+  try{
+    const value=Function(`"use strict";return (${raw})`)();
+    if(Number.isFinite(value))return `${raw} = <strong>${value}</strong>`;
+  }catch(e){}
+  return null;
+}
+
+function botReply(input){
+  const msg=input.toLowerCase().trim();
+  if(!msg)return;
+  const calc=msg.startsWith('calc')||/^[0-9+\-*/().% ]+$/.test(msg)?tryCalc(msg):null;
+  if(calc){
+    addMsg(calc);
+    return;
+  }
+
+  if(msg.includes('size')||msg.includes('taille')||msg.includes('مقاس')||msg.includes('height')||msg.includes('weight')||msg.includes('cm')||msg.includes('kg')||msg.includes('طول')||msg.includes('وزن')){
+    const data=parseNumbers(msg);
+    if(!data){
+      addMsg(tr.askStats);
+      return;
+    }
+    const fit=parseFit(msg);
+    const rec=recommendSize(data.height,data.weight,fit);
+    addMsg(tr.sizeReply(rec));
+    return;
+  }
+
+  if(msg.includes('gym')||msg.includes('جيم')){
+    addMsg(tr.gym);
+    return;
+  }
+  if(msg.includes('street')||msg.includes('ستريت')){
+    addMsg(tr.street);
+    return;
+  }
+  if(msg.includes('checkout')||msg.includes('pay')||msg.includes('paiement')||msg.includes('caisse')||msg.includes('دفع')){
+    addMsg(tr.checkout);
+    return;
+  }
+  if(msg.includes('cart')||msg.includes('bag')||msg.includes('panier')||msg.includes('حقيبة')||msg.includes('سلة')){
+    addMsg(tr.cart);
+    return;
+  }
+  if(msg.includes('lookbook')||msg.includes('لوكبوك')){
+    addMsg(tr.lookbook);
+    return;
+  }
+  if(msg.includes('shop')||msg.includes('buy')||msg.includes('product')||msg.includes('produit')||msg.includes('تسوق')||msg.includes('منتج')){
+    addMsg(tr.shop);
+    return;
+  }
+
+  addMsg(tr.fallback);
+}
+
+chatForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const text=chatInput.value.trim();
+  if(!text)return;
+  addMsg(text,'user');
+  chatInput.value='';
+  setTimeout(()=>botReply(text),180);
+});
+
+quickBtns.forEach(btn=>btn.addEventListener('click',()=>{
+  const q=btn.dataset.q;
+  addMsg(q,'user');
+  setTimeout(()=>botReply(q),120);
+}));
+
+if(mode==='sizing'){
+  addMsg(tr.sizingInit);
+}else{
+  addMsg(tr.init);
+}
+</script>
+{% endblock %}

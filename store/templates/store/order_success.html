@@ -1,0 +1,18 @@
+{% extends 'store/base.html' %}
+{% load moonblock_tags %}
+{% block title %}{% if lang == 'ar' %}تم الطلب{% elif lang == 'fr' %}Commande Confirmée{% else %}Order Confirmed{% endif %} — MOONBLOCK{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:48px;padding-top:120px;" {% if is_rtl %}dir="rtl"{% endif %}>
+  <div>
+    <div style="width:80px;height:80px;border-radius:50%;border:2px solid var(--moon);display:flex;align-items:center;justify-content:center;margin:0 auto 32px;font-size:32px;color:var(--moon);">&#10022;</div>
+    <p style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--moon);margin-bottom:12px;">{% if lang == 'ar' %}تم تأكيد الطلب{% elif lang == 'fr' %}Commande Confirmée{% else %}Order Confirmed{% endif %}</p>
+    <h1 style="font-family:'Bebas Neue';font-size:clamp(48px,7vw,80px);letter-spacing:.03em;margin-bottom:16px;">{% if lang == 'ar' %}شكراً لك!{% elif lang == 'fr' %}MERCI!{% else %}THANK YOU!{% endif %}</h1>
+    <p style="font-size:13px;color:var(--muted);letter-spacing:.08em;line-height:2;max-width:400px;margin:0 auto 8px;">{% if lang == 'ar' %}رقم الطلب #{{ order.id }}{% elif lang == 'fr' %}Commande #{{ order.id }}{% else %}Order #{{ order.id }}{% endif %}</p>
+    <p style="font-size:13px;color:var(--muted);letter-spacing:.08em;line-height:2;margin-bottom:48px;">{{ order.email }}</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <a href="{% url 'shop' %}" class="btn-primary">{% if lang == 'ar' %}مواصلة التسوق{% elif lang == 'fr' %}Continuer mes achats{% else %}Continue Shopping{% endif %}</a>
+      <a href="{% url 'home' %}" class="btn-outline">{% if lang == 'ar' %}الرئيسية{% elif lang == 'fr' %}Accueil{% else %}Back to Home{% endif %}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
