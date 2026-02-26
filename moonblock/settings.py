@@ -11,9 +11,9 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://moonblock2-production.up.railway.app",
     "https://moonblockstreetwear.com",
     "https://www.moonblockstreetwear.com",
+    "https://moonblock2-production.up.railway.app",
 ]
 
 INSTALLED_APPS = [
