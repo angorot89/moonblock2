@@ -132,8 +132,8 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': (('price', 'compare_price'), 'stock', 'available_sizes'),
         }),
         ('Images', {
-            'fields': ('image_preview', 'image', 'image2', 'image3', 'video'),
-            'description': 'Main image shown in listings. Image 2 shown on hover. Image 3 in gallery. Optional short video on product page.',
+            'fields': ('image_preview', 'image', 'image2', 'image3', 'image4', 'image5', 'image6', 'video'),
+            'description': 'Main image shown in listings. Up to 6 product images in gallery. Optional short video on product page.',
         }),
         ('Visibility', {
             'fields': (('is_active', 'is_featured', 'is_new'),),

@@ -81,11 +81,14 @@
       <video class="main-image" id="mainVideo" style="display:none;" controls playsinline preload="metadata"></video>
       {% endif %}
 
-      {% if product.image or product.image2 or product.image3 or product.video %}
+      {% if product.image or product.image2 or product.image3 or product.image4 or product.image5 or product.image6 or product.video %}
       <div class="thumbs">
         {% if product.image %}<img src="{{ product.image.url }}" alt="" class="thumb active" onclick="setMedia('image',this,'{{ product.image.url }}')">{% endif %}
         {% if product.image2 %}<img src="{{ product.image2.url }}" alt="" class="thumb" onclick="setMedia('image',this,'{{ product.image2.url }}')">{% endif %}
         {% if product.image3 %}<img src="{{ product.image3.url }}" alt="" class="thumb" onclick="setMedia('image',this,'{{ product.image3.url }}')">{% endif %}
+        {% if product.image4 %}<img src="{{ product.image4.url }}" alt="" class="thumb" onclick="setMedia('image',this,'{{ product.image4.url }}')">{% endif %}
+        {% if product.image5 %}<img src="{{ product.image5.url }}" alt="" class="thumb" onclick="setMedia('image',this,'{{ product.image5.url }}')">{% endif %}
+        {% if product.image6 %}<img src="{{ product.image6.url }}" alt="" class="thumb" onclick="setMedia('image',this,'{{ product.image6.url }}')">{% endif %}
         {% if product.video %}<button type="button" class="thumb thumb-video {% if not product.image %}active{% endif %}" onclick="setMedia('video',this,'{{ product.video.url }}')">▶</button>{% endif %}
       </div>
       {% endif %}

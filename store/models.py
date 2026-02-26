@@ -221,6 +221,9 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Main Image')
     image2 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 2 (hover)')
     image3 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 3')
+    image4 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 4')
+    image5 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 5')
+    image6 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 6')
     video = models.FileField(upload_to='products/videos/', blank=True, null=True, verbose_name='Short Video')
 
     stock = models.PositiveIntegerField(default=0)
