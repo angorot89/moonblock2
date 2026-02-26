@@ -4,7 +4,17 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'moonblock-secret-key-change-in-production-2026'
 DEBUG = True
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    "moonblock2-production.up.railway.app",
+    "moonblockstreetwear.com",
+    "www.moonblockstreetwear.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://moonblock2-production.up.railway.app",
+    "https://moonblockstreetwear.com",
+    "https://www.moonblockstreetwear.com",
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
