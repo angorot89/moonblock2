@@ -11,8 +11,9 @@
 .main-image{width:100%;height:100%;min-height:600px;object-fit:cover;display:block;}
 .main-placeholder{width:100%;min-height:600px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1a1520,#0e0d14);}
 .thumbs{position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;}
-.thumb{width:60px;height:72px;object-fit:cover;border:1px solid transparent;cursor:none;transition:border-color .2s;opacity:.6;}
+.thumb{width:60px;height:72px;object-fit:cover;border:1px solid transparent;cursor:none;transition:border-color .2s;opacity:.6;background:transparent;padding:0;}
 .thumb:hover,.thumb.active{border-color:var(--moon);opacity:1;}
+.thumb-video{display:flex;align-items:center;justify-content:center;background:#0f1118;color:var(--moon);font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;border:1px solid rgba(200,185,154,.2);}
 .detail-info{padding:80px 60px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto;}
 .detail-category{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--moon);margin-bottom:16px;text-decoration:none;}
 .detail-name{font-family:'Bebas Neue';font-size:clamp(36px,4vw,56px);letter-spacing:.03em;line-height:1;margin-bottom:24px;}
@@ -71,14 +72,24 @@
     <div class="detail-images">
       {% if product.image %}
       <img src="{{ product.image.url }}" alt="{{ product.name_en }}" class="main-image" id="mainImage">
-      {% if product.image2 or product.image3 %}
+      <video class="main-image" id="mainVideo" style="display:none;" controls playsinline preload="metadata"></video>
+      {% elif product.video %}
+      <video class="main-image" id="mainVideo" controls playsinline preload="metadata" src="{{ product.video.url }}"></video>
+      <img src="" alt="{{ product.name_en }}" class="main-image" id="mainImage" style="display:none;">
+      {% else %}
+      <img src="" alt="{{ product.name_en }}" class="main-image" id="mainImage" style="display:none;">
+      <video class="main-image" id="mainVideo" style="display:none;" controls playsinline preload="metadata"></video>
+      {% endif %}
+
+      {% if product.image or product.image2 or product.image3 or product.video %}
       <div class="thumbs">
-        <img src="{{ product.image.url }}" alt="" class="thumb active" onclick="setImg(this,'{{ product.image.url }}')">
-        {% if product.image2 %}<img src="{{ product.image2.url }}" alt="" class="thumb" onclick="setImg(this,'{{ product.image2.url }}')">{% endif %}
-        {% if product.image3 %}<img src="{{ product.image3.url }}" alt="" class="thumb" onclick="setImg(this,'{{ product.image3.url }}')">{% endif %}
+        {% if product.image %}<img src="{{ product.image.url }}" alt="" class="thumb active" onclick="setMedia('image',this,'{{ product.image.url }}')">{% endif %}
+        {% if product.image2 %}<img src="{{ product.image2.url }}" alt="" class="thumb" onclick="setMedia('image',this,'{{ product.image2.url }}')">{% endif %}
+        {% if product.image3 %}<img src="{{ product.image3.url }}" alt="" class="thumb" onclick="setMedia('image',this,'{{ product.image3.url }}')">{% endif %}
+        {% if product.video %}<button type="button" class="thumb thumb-video {% if not product.image %}active{% endif %}" onclick="setMedia('video',this,'{{ product.video.url }}')">▶</button>{% endif %}
       </div>
       {% endif %}
-      {% else %}
+      {% if not product.image and not product.video %}
       <div class="main-placeholder">
         <svg width="140" height="140" viewBox="0 0 120 120" fill="none" opacity=".3">
           <rect x="20" y="10" width="80" height="100" rx="4" stroke="#C8B99A" stroke-width="1.5"/>
@@ -169,6 +180,22 @@ function addToCart(){
   fetch('{% url "add_to_cart" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({product_id:productId,size:selectedSize,quantity:qty})})
   .then(r=>r.json()).then(d=>{if(d.success){updateCartBadge(d.cart_count);const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}});
 }
-function setImg(thumb,url){document.getElementById('mainImage').src=url;document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));thumb.classList.add('active');}
+function setMedia(type,thumb,url){
+  const img=document.getElementById('mainImage');
+  const vid=document.getElementById('mainVideo');
+  document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+  thumb.classList.add('active');
+  if(type==='video'){
+    if(img){img.style.display='none';}
+    if(vid){
+      if(vid.getAttribute('src')!==url){vid.src=url;}
+      vid.style.display='block';
+      vid.play().catch(()=>{});
+    }
+    return;
+  }
+  if(vid){vid.pause();vid.style.display='none';}
+  if(img){img.src=url;img.style.display='block';}
+}
 </script>
 {% endblock %}
