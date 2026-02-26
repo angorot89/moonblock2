@@ -20,6 +20,7 @@
 html{scroll-behavior:smooth;}
 body{background:var(--black);color:var(--white);font-family:'DM Mono',monospace;cursor:none;overflow-x:hidden;}
 {% if is_rtl %}body{font-family:'DM Mono',monospace,Arial;}{% endif %}
+img{max-width:100%;height:auto;}
 
 /* Custom Cursor */
 .cursor{width:12px;height:12px;background:var(--moon);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s,width 0.3s,height 0.3s,background 0.3s;}
@@ -129,14 +130,33 @@ footer{background:#030304;padding:80px 48px 40px;}
 {% endif %}
 
 @media(max-width:900px){
-  nav{padding:20px 24px;}.nav-links{display:none;}
-  .footer-top{grid-template-columns:1fr 1fr;gap:40px;}
+  nav{padding:16px 16px 12px;flex-wrap:wrap;gap:10px;}
+  .nav-links{display:none;}
+  .logo{font-size:24px;}
+  .nav-right{width:100%;justify-content:flex-start;flex-wrap:wrap;gap:10px;}
+  .user-greeting{order:1;}
+  .auth-link{order:2;}
+  .cart-link{order:3;}
+  .nav-cta{display:none;}
+  .footer-top{grid-template-columns:1fr 1fr;gap:28px;}
   .footer-bottom{flex-direction:column;gap:16px;}
   .ai-fab{width:58px;height:58px;right:16px;bottom:16px;}
   .ai-core{width:58px;height:58px;}
   .ai-bubble{right:82px;bottom:26px;max-width:200px;}
   {% if is_rtl %}.ai-fab{left:16px;right:auto;}{% endif %}
   {% if is_rtl %}.ai-bubble{left:82px;right:auto;}{% endif %}
+}
+@media(max-width:600px){
+  .lang-btn{padding:4px 8px;font-size:9px;}
+  .auth-link,.cart-link,.user-greeting{font-size:9px;letter-spacing:.08em;}
+  .user-greeting{display:none;}
+  footer{padding:64px 20px 28px;}
+  .footer-top{grid-template-columns:1fr;gap:22px;padding-bottom:36px;}
+  .footer-copy{text-align:center;}
+}
+@media(hover:none),(pointer:coarse){
+  body{cursor:auto;}
+  .cursor,.cursor-ring{display:none;}
 }
 </style>
 {% block extra_css %}{% endblock %}
@@ -202,15 +222,15 @@ footer{background:#030304;padding:80px 48px 40px;}
 {% endblock %}
 
 <!-- Newsletter -->
-<div style="background:var(--moon);color:var(--black);text-align:center;padding:100px 48px;" class="reveal" {% if is_rtl %}dir="rtl"{% endif %}>
+<div class="newsletter-block reveal" style="background:var(--moon);color:var(--black);text-align:center;padding:100px 48px;" {% if is_rtl %}dir="rtl"{% endif %}>
   <p style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(6,6,8,.5);margin-bottom:12px;">{% site_t site 'newsletter_label' lang %}</p>
   <h2 style="font-family:'Bebas Neue';font-size:clamp(40px,6vw,72px);letter-spacing:.03em;color:var(--black);margin-bottom:16px;">{% site_t site 'newsletter_title' lang %}</h2>
   <p style="font-size:13px;letter-spacing:.08em;opacity:.6;margin-bottom:40px;">{% site_t site 'newsletter_sub' lang %}</p>
-  <form method="post" action="{% url 'newsletter_subscribe' %}" style="display:flex;max-width:480px;margin:0 auto;">
+  <form method="post" action="{% url 'newsletter_subscribe' %}" class="newsletter-form" style="display:flex;max-width:480px;margin:0 auto;">
     {% csrf_token %}
-    <input type="email" name="email" placeholder="your@email.com" required
+    <input type="email" name="email" placeholder="your@email.com" required class="newsletter-input"
       style="flex:1;background:rgba(6,6,8,.12);border:1px solid rgba(6,6,8,.2);color:var(--black);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.1em;padding:16px 20px;outline:none;">
-    <button type="submit" style="background:var(--black);color:var(--moon);border:none;padding:16px 32px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:background .3s;">
+    <button type="submit" class="newsletter-btn" style="background:var(--black);color:var(--moon);border:none;padding:16px 32px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:background .3s;">
       {% if lang == 'ar' %}اشترك{% elif lang == 'fr' %}S'abonner{% else %}Subscribe{% endif %}
     </button>
   </form>
@@ -294,6 +314,17 @@ document.querySelectorAll('.reveal').forEach(r=>io.observe(r));
 setTimeout(()=>document.querySelectorAll('.message').forEach(m=>m.style.opacity='0'),4000);
 // Cart badge
 function updateCartBadge(count){const b=document.getElementById('cartBadge');if(b){b.textContent=count;b.style.display=count>0?'flex':'none';}}
+// Newsletter mobile stack
+if(window.matchMedia('(max-width:600px)').matches){
+  const nblock=document.querySelector('.newsletter-block');
+  const nform=document.querySelector('.newsletter-form');
+  const ninput=document.querySelector('.newsletter-input');
+  const nbtn=document.querySelector('.newsletter-btn');
+  if(nblock){nblock.style.padding='72px 20px';}
+  if(nform){nform.style.flexDirection='column';nform.style.gap='10px';nform.style.maxWidth='100%';}
+  if(ninput){ninput.style.width='100%';}
+  if(nbtn){nbtn.style.width='100%';}
+}
 // AI avatar prompt on hover + idle
 const aiFab=document.querySelector('.ai-fab');
 const aiBubble=document.getElementById('aiBubble');

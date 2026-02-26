@@ -27,6 +27,16 @@
 .empty-state h3{font-family:'Bebas Neue';font-size:48px;letter-spacing:.05em;color:var(--white);margin-bottom:16px;}
 {% if is_rtl %}.shop-header,.filter-bar{direction:rtl;}.sort-select{margin-left:0;margin-right:auto;}.product-tag{left:auto;right:16px;}{% endif %}
 @media(max-width:900px){.shop-header{padding:120px 24px 40px;}.filter-bar{padding:16px 24px;}.shop-grid{grid-template-columns:1fr 1fr;}.sort-select{margin-left:0;}}
+@media(max-width:600px){
+  .shop-header{padding:96px 16px 28px;}
+  .filter-bar{padding:12px 16px;gap:8px;}
+  .filter-label{width:100%;}
+  .filter-btn{padding:6px 10px;font-size:10px;letter-spacing:.08em;}
+  .sort-select{width:100%;margin:8px 0 0;}
+  .shop-grid{grid-template-columns:1fr;}
+  .product-overlay{padding:16px;}
+  .empty-state{padding:70px 16px;}
+}
 </style>
 {% endblock %}
 

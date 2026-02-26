@@ -22,6 +22,17 @@
 .chat-input:focus{border-color:var(--moon);}
 .send-btn{background:var(--moon);border:none;color:#060608;padding:12px 18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:none;}
 @media(max-width:900px){.chat-log{height:52vh;}}
+@media(max-width:600px){
+  .ai-page{padding-top:96px;padding-left:12px;padding-right:12px;padding-bottom:56px;}
+  .ai-head{padding:12px;gap:10px;}
+  .ai-name{font-size:10px;letter-spacing:.14em;}
+  .ai-state{font-size:10px;line-height:1.4;}
+  .chat-log{height:56vh;padding:12px;}
+  .msg{max-width:92%;font-size:12px;padding:10px 11px;}
+  .quick-row{padding:0 12px 10px;}
+  .quick-btn{font-size:10px;letter-spacing:.08em;padding:7px 8px;}
+  .chat-input-wrap{grid-template-columns:1fr;padding:10px 12px 12px;}
+}
 </style>
 {% endblock %}
 

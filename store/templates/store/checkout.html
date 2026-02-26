@@ -30,6 +30,14 @@ hr.div{border:none;border-top:1px solid rgba(200,185,154,.1);margin:20px 0;}
 .order-total{font-family:'Bebas Neue';font-size:22px;color:var(--moon);}
 {% if is_rtl %}.checkout-page,.checkout-grid{direction:rtl;}.form-input{text-align:right;}{% endif %}
 @media(max-width:900px){.checkout-page{padding:120px 20px 60px;}.checkout-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}}
+@media(max-width:600px){
+  .checkout-page{padding:96px 12px 40px;}
+  .checkout-title{margin-bottom:26px;}
+  .order-box{padding:20px;}
+  .order-item{gap:10px;}
+  .order-img,.order-ph{width:46px;height:56px;}
+  .submit-btn{padding:14px;font-size:12px;}
+}
 </style>
 {% endblock %}
 
