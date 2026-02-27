@@ -80,6 +80,19 @@ nav::before{content:'';position:absolute;inset:0;background:linear-gradient(to b
 .reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s ease,transform 0.8s ease;}
 .reveal.visible{opacity:1;transform:translateY(0);}
 
+/* Summer notice */
+.summer-notice{position:fixed;inset:0;z-index:450;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(3,4,8,.72);backdrop-filter:blur(6px);}
+.summer-notice.show{display:flex;}
+.summer-card{position:relative;width:min(620px,100%);background:linear-gradient(160deg,#11131c 0%,#0a0c12 65%,#181112 100%);border:1px solid rgba(200,185,154,.32);padding:28px 24px;box-shadow:0 26px 60px rgba(0,0,0,.55);animation:noticeIn .45s ease both;}
+.summer-badge{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--moon);margin-bottom:14px;}
+.summer-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,6vw,58px);line-height:.96;letter-spacing:.03em;margin-bottom:12px;}
+.summer-copy{font-size:13px;line-height:1.9;letter-spacing:.03em;color:var(--muted);margin-bottom:20px;max-width:560px;}
+.summer-actions{display:flex;flex-wrap:wrap;gap:10px;}
+.summer-btn{padding:12px 16px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(200,185,154,.3);color:var(--white);}
+.summer-btn.primary{background:var(--moon);color:var(--black);border-color:var(--moon);}
+.summer-skip{position:absolute;top:12px;right:12px;background:transparent;border:1px solid rgba(200,185,154,.25);color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:7px 10px;cursor:none;}
+@keyframes noticeIn{from{opacity:0;transform:translateY(18px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+
 /* Footer */
 footer{background:#030304;padding:80px 48px 40px;}
 .footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(200,185,154,0.08);}
@@ -153,6 +166,11 @@ footer{background:#030304;padding:80px 48px 40px;}
   footer{padding:64px 20px 28px;}
   .footer-top{grid-template-columns:1fr;gap:22px;padding-bottom:36px;}
   .footer-copy{text-align:center;}
+  .summer-card{padding:22px 14px 16px;}
+  .summer-copy{font-size:12px;line-height:1.7;}
+  .summer-actions{display:grid;grid-template-columns:1fr;}
+  .summer-btn,.summer-skip{text-align:center;}
+  .summer-skip{position:static;margin-top:10px;}
 }
 @media(hover:none),(pointer:coarse){
   body{cursor:auto;}
@@ -171,6 +189,21 @@ footer{background:#030304;padding:80px 48px 40px;}
   {% for message in messages %}
   <div class="message">{{ message }}</div>
   {% endfor %}
+</div>
+{% endif %}
+
+{% if request.user.is_authenticated or request.session.guest_allowed %}
+<div class="summer-notice" id="summerNotice">
+  <div class="summer-card" role="dialog" aria-modal="true" aria-label="Launch notice">
+    <span class="summer-badge">🚧 {% if lang == 'ar' %}قريباً{% elif lang == 'fr' %}Bientot{% else %}Coming Soon{% endif %}</span>
+    <h2 class="summer-title">{% if lang == 'ar' %}متجرنا يفتح رسمياً هذا الصيف!{% elif lang == 'fr' %}Notre boutique ouvre officiellement cet ete !{% else %}Our shop officially opens this summer!{% endif %}</h2>
+    <p class="summer-copy">{% if lang == 'ar' %}احصل على دخول مبكر الآن: اشترك اليوم واترك مراجعة لتحصل على خصم 20% عند الإطلاق.{% elif lang == 'fr' %}Obtenez un acces anticipe maintenant : inscrivez-vous aujourd'hui et laissez un avis pour recevoir 20% de reduction au lancement.{% else %}Get early access now—sign up today and leave a review to receive 20% off when we launch.{% endif %}</p>
+    <div class="summer-actions">
+      <a href="#newsletterBlock" class="summer-btn primary" data-close-summer>{% if lang == 'ar' %}انضم الآن{% elif lang == 'fr' %}S'inscrire{% else %}Get Early Access{% endif %}</a>
+      <a href="{{ site.instagram_url }}" target="_blank" rel="noopener" class="summer-btn">{% if lang == 'ar' %}اترك مراجعة{% elif lang == 'fr' %}Laisser un avis{% else %}Leave a Review{% endif %}</a>
+      <button type="button" class="summer-skip" data-close-summer>{% if lang == 'ar' %}تخطي{% elif lang == 'fr' %}Passer{% else %}Skip{% endif %}</button>
+    </div>
+  </div>
 </div>
 {% endif %}
 
@@ -222,7 +255,7 @@ footer{background:#030304;padding:80px 48px 40px;}
 {% endblock %}
 
 <!-- Newsletter -->
-<div class="newsletter-block reveal" style="background:var(--moon);color:var(--black);text-align:center;padding:100px 48px;" {% if is_rtl %}dir="rtl"{% endif %}>
+<div id="newsletterBlock" class="newsletter-block reveal" style="background:var(--moon);color:var(--black);text-align:center;padding:100px 48px;" {% if is_rtl %}dir="rtl"{% endif %}>
   <p style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(6,6,8,.5);margin-bottom:12px;">{% site_t site 'newsletter_label' lang %}</p>
   <h2 style="font-family:'Bebas Neue';font-size:clamp(40px,6vw,72px);letter-spacing:.03em;color:var(--black);margin-bottom:16px;">{% site_t site 'newsletter_title' lang %}</h2>
   <p style="font-size:13px;letter-spacing:.08em;opacity:.6;margin-bottom:40px;">{% site_t site 'newsletter_sub' lang %}</p>
@@ -348,6 +381,15 @@ if(aiFab){
 }
 ['mousemove','scroll','keydown','touchstart','click'].forEach(evt=>window.addEventListener(evt,startAiIdleTimer,{passive:true}));
 startAiIdleTimer();
+// Launch notice popup
+const summerNotice=document.getElementById('summerNotice');
+if(summerNotice){
+  const key='mb_summer_notice_dismissed';
+  const closeNotice=()=>{summerNotice.classList.remove('show');localStorage.setItem(key,'1');};
+  if(!localStorage.getItem(key)){setTimeout(()=>summerNotice.classList.add('show'),420);}
+  summerNotice.addEventListener('click',e=>{if(e.target===summerNotice)closeNotice();});
+  summerNotice.querySelectorAll('[data-close-summer]').forEach(btn=>btn.addEventListener('click',closeNotice));
+}
 </script>
 {% block extra_js %}{% endblock %}
 </body>
