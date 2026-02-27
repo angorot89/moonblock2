@@ -142,6 +142,9 @@
         <div class="meta-item"><span class="meta-icon">✦</span> {% if lang == 'ar' %}شحن مجاني للطلبات فوق 100 MAD{% elif lang == 'fr' %}Livraison gratuite dès 100 MAD{% else %}Free shipping on orders over 100 MAD{% endif %}</div>
         <div class="meta-item"><span class="meta-icon">✦</span> {% if lang == 'ar' %}إرجاع خلال 30 يوم{% elif lang == 'fr' %}Retours sous 30 jours{% else %}30-day returns{% endif %}</div>
         <div class="meta-item"><span class="meta-icon">✦</span> {% if lang == 'ar' %}دفع آمن{% elif lang == 'fr' %}Paiement sécurisé{% else %}Secure checkout{% endif %}</div>
+        {% if product.model_3d %}
+        <div class="meta-item"><span class="meta-icon">✦</span> <a href="{{ product.model_3d.url }}" target="_blank" rel="noopener" style="color:var(--moon);text-decoration:none;">{% if lang == 'ar' %}عرض نموذج 3D{% elif lang == 'fr' %}Voir le modele 3D{% else %}View 3D Model{% endif %}</a></div>
+        {% endif %}
       </div>
     </div>
   </div>

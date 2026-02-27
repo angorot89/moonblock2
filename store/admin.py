@@ -132,8 +132,8 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': (('price', 'compare_price'), 'stock', 'available_sizes'),
         }),
         ('Images', {
-            'fields': ('image_preview', 'image', 'image2', 'image3', 'image4', 'image5', 'image6', 'video'),
-            'description': 'Main image shown in listings. Up to 6 product images in gallery. Optional short video on product page.',
+            'fields': ('image_preview', 'image', 'image2', 'image3', 'image4', 'image5', 'image6', 'video', 'model_3d'),
+            'description': 'Main image shown in listings. Up to 6 product images in gallery. Optional short video and 3D model on product page.',
         }),
         ('Visibility', {
             'fields': (('is_active', 'is_featured', 'is_new'),),
@@ -168,7 +168,7 @@ class LookbookItemAdmin(admin.ModelAdmin):
             'fields': ('caption_en', 'caption_ar', 'caption_fr'),
         }),
         ('Image & Display', {
-            'fields': ('image_preview', 'image', 'order', 'is_active', 'created_at'),
+            'fields': ('image_preview', 'image', 'model_3d', 'order', 'is_active', 'created_at'),
         }),
     )
 

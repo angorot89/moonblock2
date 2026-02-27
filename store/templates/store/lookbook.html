@@ -38,6 +38,7 @@
     <div class="lookbook-overlay">
       <p class="lookbook-title">{{ item.title|t:lang }}</p>
       {% if item.caption_en %}<p class="lookbook-caption">{{ item.caption|t:lang }}</p>{% endif %}
+      {% if item.model_3d %}<p class="lookbook-caption" style="margin-top:8px;"><a href="{{ item.model_3d.url }}" target="_blank" rel="noopener" style="color:var(--moon);text-decoration:none;">{% if lang == 'ar' %}عرض 3D{% elif lang == 'fr' %}Voir 3D{% else %}View 3D{% endif %}</a></p>{% endif %}
     </div>
   </div>
   {% endfor %}

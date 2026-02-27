@@ -225,6 +225,7 @@ class Product(models.Model):
     image5 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 5')
     image6 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 6')
     video = models.FileField(upload_to='products/videos/', blank=True, null=True, verbose_name='Short Video')
+    model_3d = models.FileField(upload_to='products/models/', blank=True, null=True, verbose_name='3D Model')
 
     stock = models.PositiveIntegerField(default=0)
     available_sizes = models.CharField(max_length=50, default='S,M,L,XL', help_text='Comma-separated: XS,S,M,L,XL,XXL')
@@ -277,6 +278,7 @@ class LookbookItem(models.Model):
     caption_fr = models.CharField(max_length=400, blank=True, verbose_name='Caption (FR)')
 
     image = models.ImageField(upload_to='lookbook/', verbose_name='Image')
+    model_3d = models.FileField(upload_to='lookbook/models/', blank=True, null=True, verbose_name='3D Model')
     is_active = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
