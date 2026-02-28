@@ -224,9 +224,9 @@ footer{background:#030304;padding:80px 48px 40px;}
         <a href="{% url 'shop' %}?category=gym" {% if request.GET.category == 'gym' and not request.GET.section %}class="active"{% endif %}>
           {% if lang == 'ar' %}كل منتجات الجيم{% elif lang == 'fr' %}Tout Gym{% else %}All Gym{% endif %}
         </a>
-        {% for cat in all_categories %}
-        {% if cat.slug == 'gym-wear' or cat.slug == 'accessories' %}
-        <a href="{% url 'shop' %}?category={{ cat.slug }}" {% if request.GET.category == cat.slug %}class="active"{% endif %}>{{ cat.name|t:lang }}</a>
+        {% for section in gym_sections %}
+        {% if section.target_category %}
+        <a href="{% url 'shop' %}?category={{ section.target_category.slug }}" {% if request.GET.category == section.target_category.slug %}class="active"{% endif %}>{{ section.name|t:lang }}</a>
         {% endif %}
         {% endfor %}
       </div>

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
-    SiteSettings, Category, OuterwearSection, Product, LookbookItem,
+    SiteSettings, Category, OuterwearSection, GymSection, Product, LookbookItem,
     Order, OrderItem, NewsletterSubscriber
 )
 
@@ -123,6 +123,18 @@ class OuterwearSectionAdmin(admin.ModelAdmin):
     def product_count(self, obj):
         return obj.products.filter(is_active=True).count()
     product_count.short_description = 'Active Products'
+
+
+@admin.register(GymSection)
+class GymSectionAdmin(admin.ModelAdmin):
+    list_display = ['name_en', 'name_ar', 'name_fr', 'target_category', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    list_filter = ['is_active', 'target_category']
+    fieldsets = (
+        ('Section Name (all languages)', {
+            'fields': (('name_en', 'name_ar', 'name_fr'), 'target_category', ('order', 'is_active')),
+        }),
+    )
 
 
 # ─── PRODUCT ────────────────────────────────────────────────────────────────
