@@ -202,6 +202,30 @@ class Category(models.Model):
         return self.name_en
 
 
+class OuterwearSection(models.Model):
+    name_en = models.CharField(max_length=100, verbose_name='Name (EN)')
+    name_ar = models.CharField(max_length=100, blank=True, verbose_name='Name (AR)')
+    name_fr = models.CharField(max_length=100, blank=True, verbose_name='Name (FR)')
+    slug = models.SlugField(unique=True, blank=True)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Outerwear Section'
+        verbose_name_plural = 'Outerwear Sections'
+        ordering = ['order', 'name_en']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name_en)
+        super().save(*args, **kwargs)
+
+    def name(self, lang='en'):
+        return getattr(self, f'name_{lang}', None) or self.name_en
+
+    def __str__(self):
+        return self.name_en
+
+
 # ─── PRODUCT ─────────────────────────────────────────────────────────────────
 
 class Product(models.Model):
@@ -210,6 +234,13 @@ class Product(models.Model):
     name_fr = models.CharField(max_length=200, blank=True, verbose_name='Name (FR)')
     slug = models.SlugField(unique=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
+    section = models.ForeignKey(
+        OuterwearSection,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products'
+    )
 
     description_en = models.TextField(blank=True, verbose_name='Description (EN)')
     description_ar = models.TextField(blank=True, verbose_name='Description (AR)')

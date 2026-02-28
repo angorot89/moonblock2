@@ -1,4 +1,4 @@
-from .models import SiteSettings, Category
+from .models import SiteSettings, Category, OuterwearSection
 
 
 def global_context(request):
@@ -7,11 +7,13 @@ def global_context(request):
     lang = getattr(request, 'lang', 'en')
     settings = SiteSettings.get()
     categories = Category.objects.all()
+    outerwear_sections = OuterwearSection.objects.all()
 
     return {
         'cart_count': cart_count,
         'lang': lang,
         'site': settings,
         'all_categories': categories,
+        'outerwear_sections': outerwear_sections,
         'is_rtl': lang == 'ar',
     }

@@ -33,8 +33,13 @@ nav::before{content:'';position:absolute;inset:0;background:linear-gradient(to b
 .logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.15em;color:var(--white);text-decoration:none;position:relative;z-index:1;}
 .logo span{color:var(--moon);}
 .nav-links{display:flex;gap:40px;list-style:none;position:relative;z-index:1;}
+.nav-links li{position:relative;}
 .nav-links a{color:var(--white);text-decoration:none;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.7;transition:opacity 0.3s;}
 .nav-links a:hover,.nav-links a.active{opacity:1;color:var(--moon);}
+.nav-dropdown{position:absolute;top:calc(100% + 10px);left:0;min-width:230px;background:rgba(8,8,12,.96);border:1px solid rgba(200,185,154,.22);padding:10px;display:flex;flex-direction:column;gap:4px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .22s ease,transform .22s ease,visibility .22s ease;}
+.nav-dropdown a{display:block;padding:9px 10px;font-size:10px;letter-spacing:.13em;border:1px solid transparent;}
+.nav-dropdown a:hover,.nav-dropdown a.active{border-color:rgba(200,185,154,.25);background:rgba(200,185,154,.08);}
+.nav-links li:hover .nav-dropdown{opacity:1;visibility:visible;transform:translateY(0);}
 .nav-right{display:flex;align-items:center;gap:16px;position:relative;z-index:1;}
 .nav-cta{background:var(--moon);color:var(--black);padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;transition:background 0.3s;}
 .nav-cta:hover{background:var(--accent);}
@@ -134,6 +139,7 @@ footer{background:#030304;padding:80px 48px 40px;}
 {% if is_rtl %}
 .footer-top{direction:rtl;}
 .nav-links{flex-direction:row-reverse;}
+.nav-dropdown{left:auto;right:0;}
 .footer-bottom{flex-direction:row-reverse;}
 .messages-container{right:auto;left:24px;}
 .message{border-left:none;border-right:3px solid var(--moon);}
@@ -213,7 +219,19 @@ footer{background:#030304;padding:80px 48px 40px;}
   <ul class="nav-links">
     <li><a href="{% url 'shop' %}" {% if request.resolver_match.url_name == 'shop' %}class="active"{% endif %}>{% site_t site 'nav_shop' lang %}</a></li>
     <li><a href="{% url 'shop' %}?category=gym">{% site_t site 'nav_gym' lang %}</a></li>
-    <li><a href="{% url 'shop' %}?category=outerwear">{% site_t site 'nav_streetwear' lang %}</a></li>
+    <li>
+      <a href="{% url 'shop' %}?category=outerwear">{% site_t site 'nav_streetwear' lang %}</a>
+      {% if outerwear_sections %}
+      <div class="nav-dropdown">
+        <a href="{% url 'shop' %}?category=outerwear" {% if request.GET.category == 'outerwear' and not request.GET.section %}class="active"{% endif %}>
+          {% if lang == 'ar' %}كل الملابس الخارجية{% elif lang == 'fr' %}Tout Outerwear{% else %}All Outerwear{% endif %}
+        </a>
+        {% for section in outerwear_sections %}
+        <a href="{% url 'shop' %}?category=outerwear&section={{ section.slug }}" {% if request.GET.section == section.slug %}class="active"{% endif %}>{{ section.name|t:lang }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </li>
     <li><a href="{% url 'lookbook' %}" {% if request.resolver_match.url_name == 'lookbook' %}class="active"{% endif %}>{% site_t site 'nav_lookbook' lang %}</a></li>
     <li><a href="{% url 'home' %}#about">{% site_t site 'nav_about' lang %}</a></li>
   </ul>

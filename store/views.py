@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.contrib.auth import login, logout
-from .models import Product, Category, Order, OrderItem, NewsletterSubscriber, SiteSettings, LookbookItem
+from .models import Product, Category, OuterwearSection, Order, OrderItem, NewsletterSubscriber, SiteSettings, LookbookItem
 from .forms import RegisterForm, LoginForm
 import json
 
@@ -33,8 +33,10 @@ def shop(request):
     lang = request.lang
     products = Product.objects.filter(is_active=True)
     category_slug = request.GET.get('category')
+    section_slug = request.GET.get('section')
     sort = request.GET.get('sort', 'new')
     selected_category = None
+    selected_section = None
 
     if category_slug:
         # Gracefully handle invalid slugs from stale links/bookmarks.
@@ -64,6 +66,26 @@ def shop(request):
         if selected_category:
             products = products.filter(category=selected_category)
 
+    if section_slug:
+        selected_section = OuterwearSection.objects.filter(slug=section_slug).first()
+        if not selected_section:
+            normalized_section = section_slug.strip().lower()
+            if normalized_section:
+                section_variants = [
+                    normalized_section,
+                    normalized_section.replace('&', 'and'),
+                    normalized_section.replace('and', ''),
+                    normalized_section.replace('_', '-'),
+                    normalized_section.replace('-', ''),
+                    normalized_section.replace('_', ''),
+                ]
+                for variant in section_variants:
+                    selected_section = OuterwearSection.objects.filter(slug=variant).first()
+                    if selected_section:
+                        break
+        if selected_section:
+            products = products.filter(section=selected_section)
+
     if sort == 'price_asc':
         products = products.order_by('price')
     elif sort == 'price_desc':
@@ -76,6 +98,7 @@ def shop(request):
     return render(request, 'store/shop.html', {
         'products': products,
         'selected_category': selected_category,
+        'selected_section': selected_section,
         'sort': sort,
         'lang': lang,
     })

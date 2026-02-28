@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
-    SiteSettings, Category, Product, LookbookItem,
+    SiteSettings, Category, OuterwearSection, Product, LookbookItem,
     Order, OrderItem, NewsletterSubscriber
 )
 
@@ -109,21 +109,37 @@ class CategoryAdmin(admin.ModelAdmin):
     product_count.short_description = 'Active Products'
 
 
+@admin.register(OuterwearSection)
+class OuterwearSectionAdmin(admin.ModelAdmin):
+    list_display = ['name_en', 'name_ar', 'name_fr', 'slug', 'order', 'product_count']
+    list_editable = ['order']
+    prepopulated_fields = {'slug': ('name_en',)}
+    fieldsets = (
+        ('Section Name (all languages)', {
+            'fields': (('name_en', 'name_ar', 'name_fr'), 'slug', 'order'),
+        }),
+    )
+
+    def product_count(self, obj):
+        return obj.products.filter(is_active=True).count()
+    product_count.short_description = 'Active Products'
+
+
 # ─── PRODUCT ────────────────────────────────────────────────────────────────
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['image_preview', 'name_en', 'category', 'price', 'stock', 'is_active', 'is_featured', 'is_new']
+    list_display = ['image_preview', 'name_en', 'category', 'section', 'price', 'stock', 'is_active', 'is_featured', 'is_new']
     list_display_links = ['name_en']
     list_editable = ['price', 'stock', 'is_active', 'is_featured', 'is_new']
-    list_filter = ['is_active', 'is_featured', 'is_new', 'category']
+    list_filter = ['is_active', 'is_featured', 'is_new', 'category', 'section']
     search_fields = ['name_en', 'name_ar', 'name_fr']
     prepopulated_fields = {'slug': ('name_en',)}
     readonly_fields = ['image_preview', 'created_at', 'updated_at']
 
     fieldsets = (
         ('Product Name (all languages)', {
-            'fields': (('name_en', 'name_ar', 'name_fr'), 'slug', 'category'),
+            'fields': (('name_en', 'name_ar', 'name_fr'), 'slug', 'category', 'section'),
         }),
         ('Description (all languages)', {
             'fields': ('description_en', 'description_ar', 'description_fr'),

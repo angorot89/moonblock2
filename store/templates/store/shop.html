@@ -12,6 +12,10 @@
 .filter-btn:hover,.filter-btn.active{color:var(--moon);border-color:rgba(200,185,154,.3);}
 .sort-select{margin-left:auto;background:transparent;border:1px solid rgba(200,185,154,.2);color:var(--white);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;padding:8px 16px;cursor:none;outline:none;}
 .sort-select option{background:var(--dim);}
+.section-filter-bar{display:flex;align-items:center;gap:10px;padding:12px 48px;background:rgba(10,10,14,.92);border-bottom:1px solid rgba(200,185,154,.06);flex-wrap:wrap;}
+.section-filter-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);}
+.section-filter-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 12px;border:1px solid rgba(200,185,154,.14);transition:all .2s;cursor:none;}
+.section-filter-btn:hover,.section-filter-btn.active{color:var(--moon);border-color:rgba(200,185,154,.35);background:rgba(200,185,154,.08);}
 .shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px 0;}
 .product-card{position:relative;background:var(--dim);overflow:hidden;cursor:none;}
 .product-img-wrap{overflow:hidden;aspect-ratio:3/4;position:relative;}
@@ -25,13 +29,15 @@
 .product-tag{position:absolute;top:16px;left:16px;background:var(--moon);color:var(--black);font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:4px 10px;z-index:2;}
 .empty-state{padding:120px 48px;text-align:center;color:var(--muted);}
 .empty-state h3{font-family:'Bebas Neue';font-size:48px;letter-spacing:.05em;color:var(--white);margin-bottom:16px;}
-{% if is_rtl %}.shop-header,.filter-bar{direction:rtl;}.sort-select{margin-left:0;margin-right:auto;}.product-tag{left:auto;right:16px;}{% endif %}
-@media(max-width:900px){.shop-header{padding:120px 24px 40px;}.filter-bar{padding:16px 24px;}.shop-grid{grid-template-columns:1fr 1fr;}.sort-select{margin-left:0;}}
+{% if is_rtl %}.shop-header,.filter-bar,.section-filter-bar{direction:rtl;}.sort-select{margin-left:0;margin-right:auto;}.product-tag{left:auto;right:16px;}{% endif %}
+@media(max-width:900px){.shop-header{padding:120px 24px 40px;}.filter-bar,.section-filter-bar{padding:16px 24px;}.shop-grid{grid-template-columns:1fr 1fr;}.sort-select{margin-left:0;}}
 @media(max-width:600px){
   .shop-header{padding:96px 16px 28px;}
-  .filter-bar{padding:12px 16px;gap:8px;}
+  .filter-bar,.section-filter-bar{padding:12px 16px;gap:8px;}
   .filter-label{width:100%;}
+  .section-filter-label{width:100%;}
   .filter-btn{padding:6px 10px;font-size:10px;letter-spacing:.08em;}
+  .section-filter-btn{padding:6px 10px;font-size:9px;letter-spacing:.08em;}
   .sort-select{width:100%;margin:8px 0 0;}
   .shop-grid{grid-template-columns:1fr;}
   .product-overlay{padding:16px;}
@@ -53,13 +59,29 @@
   {% for cat in all_categories %}
   <a href="{% url 'shop' %}?category={{ cat.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="filter-btn {% if selected_category.slug == cat.slug %}active{% endif %}">{{ cat.name|t:lang }}</a>
   {% endfor %}
-  <select class="sort-select" onchange="location='?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort='+this.value">
+  <select class="sort-select" onchange="location='?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}sort='+this.value">
     <option value="new" {% if sort == 'new' %}selected{% endif %}>{% if lang == 'ar' %}الأحدث{% elif lang == 'fr' %}Nouveautés{% else %}Newest{% endif %}</option>
     <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأقل{% elif lang == 'fr' %}Prix croissant{% else %}Price: Low to High{% endif %}</option>
     <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأعلى{% elif lang == 'fr' %}Prix décroissant{% else %}Price: High to Low{% endif %}</option>
     <option value="name" {% if sort == 'name' %}selected{% endif %}>{% if lang == 'ar' %}الاسم{% elif lang == 'fr' %}Nom A-Z{% else %}Name A-Z{% endif %}</option>
   </select>
 </div>
+
+{% if selected_category and outerwear_sections %}
+{% if selected_category.slug == 'outerwear' or selected_category.slug == 'streetwear' %}
+<div class="section-filter-bar" {% if is_rtl %}dir="rtl"{% endif %}>
+  <span class="section-filter-label">{% if lang == 'ar' %}أقسام الملابس الخارجية:{% elif lang == 'fr' %}Sections outerwear:{% else %}Outerwear sections:{% endif %}</span>
+  <a href="{% url 'shop' %}?category={{ selected_category.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if not selected_section %}active{% endif %}">
+    {% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tout{% else %}All{% endif %}
+  </a>
+  {% for section in outerwear_sections %}
+  <a href="{% url 'shop' %}?category={{ selected_category.slug }}&section={{ section.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if selected_section and selected_section.slug == section.slug %}active{% endif %}">
+    {{ section.name|t:lang }}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endif %}
 
 {% if products %}
 <div class="shop-grid">
