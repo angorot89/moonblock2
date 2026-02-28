@@ -78,11 +78,11 @@ const t={
     askStats:'Send your <strong>height (cm)</strong> and <strong>weight (kg)</strong>, for example: <em>178 cm, 74 kg, regular fit</em>.',
     sizeReply:(rec)=>`Recommended: <strong>${rec.main}</strong>.<br>Comfort option: <strong>${rec.alt}</strong>.<br>BMI: ${rec.bmi}.`,
     gym:'Go here: <a href="/shop/?category=gym">Gym Collection</a>.',
-    street:'Go here: <a href="/shop/?category=streetwear">Streetwear</a>.',
+    street:'Go here: <a href="/shop/?category=outerwear">Outerwear</a>.',
     checkout:'Checkout link: <a href="/checkout/">Proceed to Checkout</a>.',
     cart:'Open your bag here: <a href="/cart/">Cart</a>.',
     lookbook:'Explore style ideas here: <a href="/lookbook/">Lookbook</a>.',
-    shop:'Start shopping: <a href="/shop/">Shop All</a>. You can ask me "gym", "streetwear", or "size help".',
+    shop:'Start shopping: <a href="/shop/">Shop All</a>. You can ask me "gym", "outerwear", or "size help".',
     fallback:'I can help with sizing, store navigation, and calculations. Try: <em>178 cm 74 kg regular</em> or <em>calc 1299*3</em>.',
     sizingInit:'Sizing mode is ready. Send your height and weight to get your fit recommendation.',
     init:'Hi, I am your MOONBLOCK AI assistant. I can help you find products, pick sizes, and calculate totals.'
@@ -91,11 +91,11 @@ const t={
     askStats:'أرسل <strong>الطول (سم)</strong> و<strong>الوزن (كغ)</strong> مثل: <em>178 سم، 74 كغ، مقاس عادي</em>.',
     sizeReply:(rec)=>`المقاس المقترح: <strong>${rec.main}</strong>.<br>خيار أريح: <strong>${rec.alt}</strong>.<br>BMI: ${rec.bmi}.`,
     gym:'اذهب إلى: <a href="/shop/?category=gym">قسم الجيم</a>.',
-    street:'اذهب إلى: <a href="/shop/?category=streetwear">قسم ستريت وير</a>.',
+    street:'اذهب إلى: <a href="/shop/?category=outerwear">قسم الملابس الخارجية</a>.',
     checkout:'رابط الدفع: <a href="/checkout/">إتمام الطلب</a>.',
     cart:'افتح حقيبتك من هنا: <a href="/cart/">الحقيبة</a>.',
     lookbook:'شاهد الإلهام من هنا: <a href="/lookbook/">اللوكبوك</a>.',
-    shop:'ابدأ التسوق: <a href="/shop/">كل المنتجات</a>. يمكنك أن تطلب جيم أو ستريت وير أو مساعدة مقاس.',
+    shop:'ابدأ التسوق: <a href="/shop/">كل المنتجات</a>. يمكنك أن تطلب جيم أو ملابس خارجية أو مساعدة مقاس.',
     fallback:'أقدر أساعدك في المقاسات، التنقل داخل المتجر، والحسابات. جرّب: <em>178 سم 74 كغ عادي</em> أو <em>calc 1299*3</em>.',
     sizingInit:'وضع المقاسات جاهز. أرسل الطول والوزن لتحصل على المقاس المناسب.',
     init:'مرحباً، أنا مساعد MOONBLOCK الذكي. أساعدك في المقاسات، التسوق، والحسابات.'
@@ -104,11 +104,11 @@ const t={
     askStats:'Envoyez votre <strong>taille (cm)</strong> et votre <strong>poids (kg)</strong>, par exemple: <em>178 cm, 74 kg, coupe regular</em>.',
     sizeReply:(rec)=>`Taille recommandee: <strong>${rec.main}</strong>.<br>Option plus ample: <strong>${rec.alt}</strong>.<br>IMC: ${rec.bmi}.`,
     gym:'Allez ici: <a href="/shop/?category=gym">Collection Gym</a>.',
-    street:'Allez ici: <a href="/shop/?category=streetwear">Streetwear</a>.',
+    street:'Allez ici: <a href="/shop/?category=outerwear">Outerwear</a>.',
     checkout:'Lien de paiement: <a href="/checkout/">Passer a la caisse</a>.',
     cart:'Ouvrez votre panier ici: <a href="/cart/">Panier</a>.',
     lookbook:'Inspiration ici: <a href="/lookbook/">Lookbook</a>.',
-    shop:'Commencez ici: <a href="/shop/">Shop All</a>. Vous pouvez demander gym, streetwear, ou aide taille.',
+    shop:'Commencez ici: <a href="/shop/">Shop All</a>. Vous pouvez demander gym, outerwear, ou aide taille.',
     fallback:'Je peux aider pour les tailles, la navigation et les calculs. Essayez: <em>178 cm 74 kg regular</em> ou <em>calc 1299*3</em>.',
     sizingInit:'Mode taille actif. Envoyez votre taille et votre poids pour une recommandation.',
     init:'Bonjour, je suis votre assistant IA MOONBLOCK. Je peux aider pour le shopping, les tailles et les calculs.'
@@ -195,7 +195,7 @@ function botReply(input){
     addMsg(tr.gym);
     return;
   }
-  if(msg.includes('street')||msg.includes('ستريت')){
+  if(msg.includes('outerwear')||msg.includes('ملابس خارجية')||msg.includes('street')||msg.includes('ستريت')){
     addMsg(tr.street);
     return;
   }

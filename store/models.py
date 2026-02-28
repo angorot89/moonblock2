@@ -46,8 +46,8 @@ class SiteSettings(models.Model):
     hero_cta2_fr = models.CharField(max_length=100, default='Voir le Lookbook', blank=True)
 
     # Ticker items (comma-separated)
-    ticker_items_en = models.CharField(max_length=500, default='MOONBLOCK,STREETWEAR,GYM WEAR,SS 2026,MOVE BY NIGHT')
-    ticker_items_ar = models.CharField(max_length=500, default='مونبلوك,ستريت وير,ملابس جيم,SS 2026,تحرك في الليل', blank=True)
+    ticker_items_en = models.CharField(max_length=500, default='MOONBLOCK,OUTERWEAR,GYM WEAR,SS 2026,MOVE BY NIGHT')
+    ticker_items_ar = models.CharField(max_length=500, default='مونبلوك,ملابس خارجية,ملابس جيم,SS 2026,تحرك في الليل', blank=True)
     ticker_items_fr = models.CharField(max_length=500, default='MOONBLOCK,VÊTEMENTS DE RUE,TENUE GYM,SS 2026,BOUGER LA NUIT', blank=True)
 
     # New Arrivals section
@@ -119,9 +119,9 @@ class SiteSettings(models.Model):
     newsletter_sub_fr = models.CharField(max_length=200, default='Accès anticipé aux drops. Zéro spam. Pur Moonblock.', blank=True)
 
     # Footer
-    footer_tagline_en = models.CharField(max_length=300, default='Streetwear and gym wear for those who move by night and grind by day.')
+    footer_tagline_en = models.CharField(max_length=300, default='Outerwear and gym wear for those who move by night and grind by day.')
     footer_tagline_ar = models.CharField(max_length=300, default='ملابس شارع وجيم لمن يتحرك ليلاً ويكد نهاراً.', blank=True)
-    footer_tagline_fr = models.CharField(max_length=300, default='Streetwear et tenue de gym pour ceux qui bougent la nuit et travaillent le jour.', blank=True)
+    footer_tagline_fr = models.CharField(max_length=300, default='Outerwear et tenue de gym pour ceux qui bougent la nuit et travaillent le jour.', blank=True)
 
     # Social links
     instagram_url = models.URLField(blank=True, default='#')
@@ -137,9 +137,9 @@ class SiteSettings(models.Model):
     nav_gym_ar = models.CharField(max_length=50, default='جيم', blank=True)
     nav_gym_fr = models.CharField(max_length=50, default='Gym', blank=True)
 
-    nav_streetwear_en = models.CharField(max_length=50, default='Streetwear')
-    nav_streetwear_ar = models.CharField(max_length=50, default='ستريت وير', blank=True)
-    nav_streetwear_fr = models.CharField(max_length=50, default='Streetwear', blank=True)
+    nav_streetwear_en = models.CharField(max_length=50, default='Outerwear')
+    nav_streetwear_ar = models.CharField(max_length=50, default='ملابس خارجية', blank=True)
+    nav_streetwear_fr = models.CharField(max_length=50, default='Outerwear', blank=True)
 
     nav_lookbook_en = models.CharField(max_length=50, default='Lookbook')
     nav_lookbook_ar = models.CharField(max_length=50, default='لوك بوك', blank=True)

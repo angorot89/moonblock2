@@ -213,7 +213,7 @@ footer{background:#030304;padding:80px 48px 40px;}
   <ul class="nav-links">
     <li><a href="{% url 'shop' %}" {% if request.resolver_match.url_name == 'shop' %}class="active"{% endif %}>{% site_t site 'nav_shop' lang %}</a></li>
     <li><a href="{% url 'shop' %}?category=gym">{% site_t site 'nav_gym' lang %}</a></li>
-    <li><a href="{% url 'shop' %}?category=streetwear">{% site_t site 'nav_streetwear' lang %}</a></li>
+    <li><a href="{% url 'shop' %}?category=outerwear">{% site_t site 'nav_streetwear' lang %}</a></li>
     <li><a href="{% url 'lookbook' %}" {% if request.resolver_match.url_name == 'lookbook' %}class="active"{% endif %}>{% site_t site 'nav_lookbook' lang %}</a></li>
     <li><a href="{% url 'home' %}#about">{% site_t site 'nav_about' lang %}</a></li>
   </ul>

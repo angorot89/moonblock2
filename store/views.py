@@ -43,6 +43,10 @@ def shop(request):
             slug_variants = []
             normalized = category_slug.strip().lower()
             if normalized:
+                alias_map = {
+                    'outerwear': ['streetwear'],
+                    'streetwear': ['outerwear'],
+                }
                 slug_variants.extend([
                     normalized.replace('_', '-'),
                     normalized.replace('-', ''),
@@ -50,6 +54,7 @@ def shop(request):
                     normalized.split('-')[0],
                     normalized.split('_')[0],
                 ])
+                slug_variants.extend(alias_map.get(normalized, []))
                 for variant in slug_variants:
                     if not variant:
                         continue

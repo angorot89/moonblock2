@@ -29,7 +29,7 @@ cats = [
     ("Gym Wear", "ملابس جيم", "Tenue de Gym", "gym-wear", 2),
     ("Bottoms", "بنطلونات", "Bas", "bottoms", 3),
     ("Accessories", "إكسسوارات", "Accessoires", "accessories", 4),
-    ("Streetwear", "ستريت وير", "Streetwear", "streetwear", 5),
+    ("Outerwear", "ملابس خارجية", "Outerwear", "outerwear", 5),
 ]
 for en, ar, fr, slug, order in cats:
     cat, created = Category.objects.get_or_create(slug=slug, defaults={"name_en": en, "name_ar": ar, "name_fr": fr, "order": order})
