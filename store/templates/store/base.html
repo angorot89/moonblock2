@@ -218,7 +218,19 @@ footer{background:#030304;padding:80px 48px 40px;}
   <a href="{% url 'home' %}" class="logo">MOON<span>BLOCK</span></a>
   <ul class="nav-links">
     <li><a href="{% url 'shop' %}" {% if request.resolver_match.url_name == 'shop' %}class="active"{% endif %}>{% site_t site 'nav_shop' lang %}</a></li>
-    <li><a href="{% url 'shop' %}?category=gym">{% site_t site 'nav_gym' lang %}</a></li>
+    <li>
+      <a href="{% url 'shop' %}?category=gym">{% site_t site 'nav_gym' lang %}</a>
+      <div class="nav-dropdown">
+        <a href="{% url 'shop' %}?category=gym" {% if request.GET.category == 'gym' and not request.GET.section %}class="active"{% endif %}>
+          {% if lang == 'ar' %}كل منتجات الجيم{% elif lang == 'fr' %}Tout Gym{% else %}All Gym{% endif %}
+        </a>
+        {% for cat in all_categories %}
+        {% if cat.slug == 'gym-wear' or cat.slug == 'accessories' %}
+        <a href="{% url 'shop' %}?category={{ cat.slug }}" {% if request.GET.category == cat.slug %}class="active"{% endif %}>{{ cat.name|t:lang }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
     <li>
       <a href="{% url 'shop' %}?category=outerwear">{% site_t site 'nav_streetwear' lang %}</a>
       {% if outerwear_sections %}

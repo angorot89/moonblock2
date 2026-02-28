@@ -48,6 +48,8 @@ def shop(request):
                 alias_map = {
                     'outerwear': ['streetwear'],
                     'streetwear': ['outerwear'],
+                    'gym': ['gym-wear'],
+                    'gym-wear': ['gym'],
                 }
                 slug_variants.extend([
                     normalized.replace('_', '-'),
