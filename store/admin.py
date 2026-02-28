@@ -1,7 +1,10 @@
 from django.contrib import admin
+from django import forms
+from django.urls import path
+from django.http import JsonResponse
 from django.utils.html import format_html
 from .models import (
-    SiteSettings, Category, OuterwearSection, GymSection, Product, LookbookItem,
+    SiteSettings, Category, OuterwearSection, Product, LookbookItem,
     Order, OrderItem, NewsletterSubscriber
 )
 
@@ -111,12 +114,13 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(OuterwearSection)
 class OuterwearSectionAdmin(admin.ModelAdmin):
-    list_display = ['name_en', 'name_ar', 'name_fr', 'slug', 'order', 'product_count']
-    list_editable = ['order']
+    list_display = ['name_en', 'name_ar', 'name_fr', 'target_category', 'slug', 'order', 'is_active', 'product_count']
+    list_editable = ['order', 'is_active']
+    list_filter = ['target_category', 'is_active']
     prepopulated_fields = {'slug': ('name_en',)}
     fieldsets = (
         ('Section Name (all languages)', {
-            'fields': (('name_en', 'name_ar', 'name_fr'), 'slug', 'order'),
+            'fields': (('name_en', 'name_ar', 'name_fr'), 'slug', 'target_category', ('order', 'is_active')),
         }),
     )
 
@@ -125,22 +129,36 @@ class OuterwearSectionAdmin(admin.ModelAdmin):
     product_count.short_description = 'Active Products'
 
 
-@admin.register(GymSection)
-class GymSectionAdmin(admin.ModelAdmin):
-    list_display = ['name_en', 'name_ar', 'name_fr', 'target_category', 'order', 'is_active']
-    list_editable = ['order', 'is_active']
-    list_filter = ['is_active', 'target_category']
-    fieldsets = (
-        ('Section Name (all languages)', {
-            'fields': (('name_en', 'name_ar', 'name_fr'), 'target_category', ('order', 'is_active')),
-        }),
-    )
+class ProductAdminForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+    class Media:
+        js = ('store/admin/product_section_filter.js',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        category_id = self.data.get('category') or getattr(self.instance, 'category_id', None)
+        queryset = OuterwearSection.objects.filter(is_active=True)
+        if category_id:
+            queryset = queryset.filter(target_category_id=category_id)
+        self.fields['section'].queryset = queryset.order_by('order', 'name_en')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        category = cleaned_data.get('category')
+        section = cleaned_data.get('section')
+        if section and category and section.target_category_id and section.target_category_id != category.id:
+            raise forms.ValidationError('Selected section does not belong to the selected category.')
+        return cleaned_data
 
 
 # ─── PRODUCT ────────────────────────────────────────────────────────────────
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductAdminForm
     list_display = ['image_preview', 'name_en', 'category', 'section', 'price', 'stock', 'is_active', 'is_featured', 'is_new']
     list_display_links = ['name_en']
     list_editable = ['price', 'stock', 'is_active', 'is_featured', 'is_new']
@@ -171,6 +189,24 @@ class ProductAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('sections-by-category/', self.admin_site.admin_view(self.sections_by_category), name='store_product_sections_by_category'),
+        ]
+        return custom_urls + urls
+
+    def sections_by_category(self, request):
+        category_id = request.GET.get('category_id')
+        queryset = OuterwearSection.objects.filter(is_active=True)
+        if category_id:
+            queryset = queryset.filter(target_category_id=category_id)
+        data = [
+            {'id': section.id, 'name': section.name_en}
+            for section in queryset.order_by('order', 'name_en')
+        ]
+        return JsonResponse({'results': data})
 
     def image_preview(self, obj):
         if obj.image:

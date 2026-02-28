@@ -1,4 +1,4 @@
-from .models import SiteSettings, Category, OuterwearSection, GymSection
+from .models import SiteSettings, Category, OuterwearSection
 
 
 def global_context(request):
@@ -7,8 +7,14 @@ def global_context(request):
     lang = getattr(request, 'lang', 'en')
     settings = SiteSettings.get()
     categories = Category.objects.all()
-    outerwear_sections = OuterwearSection.objects.all()
-    gym_sections = GymSection.objects.filter(is_active=True)
+    outerwear_sections = OuterwearSection.objects.filter(
+        is_active=True,
+        target_category__slug__in=['outerwear', 'streetwear']
+    )
+    gym_sections = OuterwearSection.objects.filter(
+        is_active=True,
+        target_category__slug__in=['gym', 'gym-wear', 'accessories']
+    )
 
     return {
         'cart_count': cart_count,

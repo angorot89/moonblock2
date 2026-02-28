@@ -59,7 +59,7 @@
   {% for cat in all_categories %}
   <a href="{% url 'shop' %}?category={{ cat.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="filter-btn {% if selected_category.slug == cat.slug %}active{% endif %}">{{ cat.name|t:lang }}</a>
   {% endfor %}
-  <select class="sort-select" onchange="location='?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}sort='+this.value">
+  <select class="sort-select" onchange="location='?{% if selected_category_param %}category={{ selected_category_param }}&{% elif selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}sort='+this.value">
     <option value="new" {% if sort == 'new' %}selected{% endif %}>{% if lang == 'ar' %}الأحدث{% elif lang == 'fr' %}Nouveautés{% else %}Newest{% endif %}</option>
     <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأقل{% elif lang == 'fr' %}Prix croissant{% else %}Price: Low to High{% endif %}</option>
     <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأعلى{% elif lang == 'fr' %}Prix décroissant{% else %}Price: High to Low{% endif %}</option>
@@ -67,20 +67,18 @@
   </select>
 </div>
 
-{% if selected_category and outerwear_sections %}
-{% if selected_category.slug == 'outerwear' or selected_category.slug == 'streetwear' %}
+{% if selected_category and available_sections %}
 <div class="section-filter-bar" {% if is_rtl %}dir="rtl"{% endif %}>
-  <span class="section-filter-label">{% if lang == 'ar' %}أقسام الملابس الخارجية:{% elif lang == 'fr' %}Sections outerwear:{% else %}Outerwear sections:{% endif %}</span>
-  <a href="{% url 'shop' %}?category={{ selected_category.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if not selected_section %}active{% endif %}">
+  <span class="section-filter-label">{% if lang == 'ar' %}الأقسام:{% elif lang == 'fr' %}Sections:{% else %}Sections:{% endif %}</span>
+  <a href="{% url 'shop' %}?category={% if selected_category_param %}{{ selected_category_param }}{% else %}{{ selected_category.slug }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if not selected_section %}active{% endif %}">
     {% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tout{% else %}All{% endif %}
   </a>
-  {% for section in outerwear_sections %}
-  <a href="{% url 'shop' %}?category={{ selected_category.slug }}&section={{ section.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if selected_section and selected_section.slug == section.slug %}active{% endif %}">
+  {% for section in available_sections %}
+  <a href="{% url 'shop' %}?category={% if selected_category_param %}{{ selected_category_param }}{% else %}{{ selected_category.slug }}{% endif %}&section={{ section.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if selected_section and selected_section.slug == section.slug %}active{% endif %}">
     {{ section.name|t:lang }}
   </a>
   {% endfor %}
 </div>
-{% endif %}
 {% endif %}
 
 {% if products %}

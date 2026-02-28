@@ -37,6 +37,9 @@ def shop(request):
     sort = request.GET.get('sort', 'new')
     selected_category = None
     selected_section = None
+    available_sections = OuterwearSection.objects.none()
+    selected_category_param = ''
+    gym_parent_mode = False
 
     if category_slug:
         # Gracefully handle invalid slugs from stale links/bookmarks.
@@ -67,9 +70,27 @@ def shop(request):
                         break
         if selected_category:
             products = products.filter(category=selected_category)
+            available_sections = OuterwearSection.objects.filter(
+                is_active=True,
+                target_category=selected_category
+            ).order_by('order', 'name_en')
+            selected_category_param = selected_category.slug
+
+        normalized_input = category_slug.strip().lower()
+        if normalized_input == 'gym':
+            gym_parent_mode = True
+            products = Product.objects.filter(
+                is_active=True,
+                category__slug__in=['gym', 'gym-wear', 'accessories']
+            )
+            available_sections = OuterwearSection.objects.filter(
+                is_active=True,
+                target_category__slug__in=['gym', 'gym-wear', 'accessories']
+            ).order_by('order', 'name_en')
+            selected_category_param = 'gym'
 
     if section_slug:
-        selected_section = OuterwearSection.objects.filter(slug=section_slug).first()
+        selected_section = OuterwearSection.objects.filter(slug=section_slug, is_active=True).first()
         if not selected_section:
             normalized_section = section_slug.strip().lower()
             if normalized_section:
@@ -82,11 +103,19 @@ def shop(request):
                     normalized_section.replace('_', ''),
                 ]
                 for variant in section_variants:
-                    selected_section = OuterwearSection.objects.filter(slug=variant).first()
+                    selected_section = OuterwearSection.objects.filter(slug=variant, is_active=True).first()
                     if selected_section:
                         break
         if selected_section:
-            products = products.filter(section=selected_section)
+            if gym_parent_mode:
+                if selected_section.target_category and selected_section.target_category.slug not in ['gym', 'gym-wear', 'accessories']:
+                    selected_section = None
+                else:
+                    products = products.filter(section=selected_section)
+            elif selected_category and selected_section.target_category_id and selected_section.target_category_id != selected_category.id:
+                selected_section = None
+            else:
+                products = products.filter(section=selected_section)
 
     if sort == 'price_asc':
         products = products.order_by('price')
@@ -100,7 +129,9 @@ def shop(request):
     return render(request, 'store/shop.html', {
         'products': products,
         'selected_category': selected_category,
+        'selected_category_param': selected_category_param,
         'selected_section': selected_section,
+        'available_sections': available_sections,
         'sort': sort,
         'lang': lang,
     })
