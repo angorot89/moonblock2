@@ -7,6 +7,8 @@ from .models import Product, Category, OuterwearSection, Order, OrderItem, Newsl
 from .forms import RegisterForm, LoginForm
 import json
 
+VALID_AUDIENCES = {'all', 'him', 'her'}
+
 
 def get_cart(request):
     return request.session.get('cart', {})
@@ -16,10 +18,31 @@ def save_cart(request, cart):
     request.session.modified = True
 
 
+def resolve_audience(request):
+    requested = (request.GET.get('audience') or '').strip().lower()
+    if requested in VALID_AUDIENCES:
+        request.session['preferred_audience'] = requested
+        request.session.modified = True
+        return requested
+    return request.session.get('preferred_audience', 'all')
+
+
+def apply_audience_filter(queryset, audience):
+    if audience == 'him':
+        return queryset.filter(target_audience__in=['him', 'all'])
+    if audience == 'her':
+        return queryset.filter(target_audience__in=['her', 'all'])
+    return queryset
+
+
 def home(request):
     lang = request.lang
     site = SiteSettings.get()
-    new_arrivals = Product.objects.filter(is_active=True, is_new=True)[:5]
+    audience = resolve_audience(request)
+    new_arrivals = apply_audience_filter(
+        Product.objects.filter(is_active=True, is_new=True),
+        audience
+    )[:5]
     categories = Category.objects.all()
     return render(request, 'store/home.html', {
         'new_arrivals': new_arrivals,
@@ -31,7 +54,8 @@ def home(request):
 
 def shop(request):
     lang = request.lang
-    products = Product.objects.filter(is_active=True)
+    audience = resolve_audience(request)
+    products = apply_audience_filter(Product.objects.filter(is_active=True), audience)
     category_slug = request.GET.get('category')
     section_slug = request.GET.get('section')
     sort = request.GET.get('sort', 'new')
@@ -79,9 +103,12 @@ def shop(request):
         normalized_input = category_slug.strip().lower()
         if normalized_input == 'gym':
             gym_parent_mode = True
-            products = Product.objects.filter(
-                is_active=True,
-                category__slug__in=['gym', 'gym-wear', 'accessories']
+            products = apply_audience_filter(
+                Product.objects.filter(
+                    is_active=True,
+                    category__slug__in=['gym', 'gym-wear', 'accessories']
+                ),
+                audience
             )
             available_sections = OuterwearSection.objects.filter(
                 is_active=True,
@@ -132,6 +159,7 @@ def shop(request):
         'selected_category_param': selected_category_param,
         'selected_section': selected_section,
         'available_sections': available_sections,
+        'audience': audience,
         'sort': sort,
         'lang': lang,
     })
@@ -139,8 +167,12 @@ def shop(request):
 
 def product_detail(request, slug):
     lang = request.lang
+    audience = resolve_audience(request)
     product = get_object_or_404(Product, slug=slug, is_active=True)
-    related = Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id)[:4]
+    related = apply_audience_filter(
+        Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id),
+        audience
+    )[:4]
     return render(request, 'store/product_detail.html', {
         'product': product,
         'related': related,
@@ -278,6 +310,17 @@ def newsletter_subscribe(request):
 def set_language(request, lang):
     if lang in ['en', 'ar', 'fr']:
         request.session['lang'] = lang
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def set_audience(request, audience):
+    audience = (audience or '').strip().lower()
+    if audience in VALID_AUDIENCES:
+        request.session['preferred_audience'] = audience
+        request.session.modified = True
+    next_url = request.GET.get('next')
+    if next_url and next_url.startswith('/'):
+        return redirect(next_url)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 

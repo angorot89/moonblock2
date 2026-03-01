@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/cart/remove/', views.remove_from_cart, name='remove_from_cart'),
     path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path('lang/<str:lang>/', views.set_language, name='set_language'),
+    path('audience/<str:audience>/', views.set_audience, name='set_audience'),
 ]

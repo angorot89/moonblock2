@@ -23,5 +23,7 @@ def global_context(request):
         'all_categories': categories,
         'outerwear_sections': outerwear_sections,
         'gym_sections': gym_sections,
+        'preferred_audience': request.session.get('preferred_audience', 'all'),
+        'has_audience_selected': 'preferred_audience' in request.session,
         'is_rtl': lang == 'ar',
     }

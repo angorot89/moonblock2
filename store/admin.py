@@ -159,10 +159,10 @@ class ProductAdminForm(forms.ModelForm):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
-    list_display = ['image_preview', 'name_en', 'category', 'section', 'price', 'stock', 'is_active', 'is_featured', 'is_new']
+    list_display = ['image_preview', 'name_en', 'category', 'section', 'target_audience', 'price', 'stock', 'is_active', 'is_featured', 'is_new']
     list_display_links = ['name_en']
     list_editable = ['price', 'stock', 'is_active', 'is_featured', 'is_new']
-    list_filter = ['is_active', 'is_featured', 'is_new', 'category', 'section']
+    list_filter = ['is_active', 'is_featured', 'is_new', 'category', 'section', 'target_audience']
     search_fields = ['name_en', 'name_ar', 'name_fr']
     prepopulated_fields = {'slug': ('name_en',)}
     readonly_fields = ['image_preview', 'created_at', 'updated_at']
@@ -175,7 +175,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('description_en', 'description_ar', 'description_fr'),
         }),
         ('Pricing & Stock', {
-            'fields': (('price', 'compare_price'), 'stock', 'available_sizes'),
+            'fields': (('price', 'compare_price'), 'target_audience', 'stock', 'available_sizes'),
         }),
         ('Images', {
             'fields': ('image_preview', 'image', 'image2', 'image3', 'image4', 'image5', 'image6', 'video', 'model_3d'),

@@ -237,6 +237,12 @@ class OuterwearSection(models.Model):
 # ─── PRODUCT ─────────────────────────────────────────────────────────────────
 
 class Product(models.Model):
+    AUDIENCE_CHOICES = [
+        ('all', 'For All'),
+        ('him', 'For Him'),
+        ('her', 'For Her'),
+    ]
+
     name_en = models.CharField(max_length=200, verbose_name='Name (EN)')
     name_ar = models.CharField(max_length=200, blank=True, verbose_name='Name (AR)')
     name_fr = models.CharField(max_length=200, blank=True, verbose_name='Name (FR)')
@@ -256,6 +262,12 @@ class Product(models.Model):
 
     price = models.DecimalField(max_digits=8, decimal_places=2)
     compare_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    target_audience = models.CharField(
+        max_length=10,
+        choices=AUDIENCE_CHOICES,
+        default='all',
+        verbose_name='Audience'
+    )
 
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Main Image')
     image2 = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Image 2 (hover)')

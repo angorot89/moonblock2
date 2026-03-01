@@ -49,6 +49,9 @@ nav::before{content:'';position:absolute;inset:0;background:linear-gradient(to b
 .auth-link{color:var(--white);text-decoration:none;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.8;transition:opacity .2s,color .2s;}
 .auth-link:hover{opacity:1;color:var(--moon);}
 .user-greeting{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--moon);}
+.audience-nav{display:flex;align-items:center;gap:6px;}
+.audience-link{font-size:9px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 8px;border:1px solid rgba(200,185,154,.18);transition:all .2s;}
+.audience-link.active,.audience-link:hover{color:var(--moon);border-color:rgba(200,185,154,.35);background:rgba(200,185,154,.08);}
 
 /* Language Switcher */
 .lang-switcher{display:flex;gap:4px;position:relative;z-index:1;}
@@ -97,6 +100,40 @@ nav::before{content:'';position:absolute;inset:0;background:linear-gradient(to b
 .summer-btn.primary{background:var(--moon);color:var(--black);border-color:var(--moon);}
 .summer-skip{position:absolute;top:12px;right:12px;background:transparent;border:1px solid rgba(200,185,154,.25);color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:7px 10px;cursor:none;}
 @keyframes noticeIn{from{opacity:0;transform:translateY(18px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* Audience gate */
+.audience-gate{position:fixed;inset:0;z-index:460;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 15%,rgba(200,185,154,.18),transparent 46%),rgba(4,5,8,.92);backdrop-filter:blur(7px);}
+.audience-gate.show{display:flex;}
+.audience-shell{width:min(980px,100%);background:linear-gradient(160deg,#11131c 0%,#090b11 60%,#140f13 100%);border:1px solid rgba(200,185,154,.26);padding:24px;box-shadow:0 24px 56px rgba(0,0,0,.58);animation:noticeIn .5s ease both;}
+.audience-head{margin-bottom:18px;}
+.audience-kicker{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--moon);display:block;margin-bottom:8px;}
+.audience-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5vw,58px);letter-spacing:.04em;line-height:.95;}
+.audience-sub{color:var(--muted);font-size:12px;letter-spacing:.05em;line-height:1.7;margin-top:10px;}
+.audience-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.audience-card{position:relative;display:block;text-decoration:none;padding:16px 14px;background:rgba(12,13,19,.82);border:1px solid rgba(200,185,154,.18);min-height:220px;overflow:hidden;transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease;}
+.audience-card:hover{transform:translateY(-3px);border-color:rgba(200,185,154,.4);box-shadow:0 12px 30px rgba(0,0,0,.35);}
+.audience-label{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;letter-spacing:.03em;color:var(--white);}
+.audience-meta{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--moon);display:block;margin-top:8px;}
+.workout-stage{position:absolute;left:14px;right:14px;bottom:10px;height:140px;border:1px solid rgba(200,185,154,.14);background:linear-gradient(180deg,rgba(200,185,154,.08),rgba(200,185,154,.02));overflow:hidden;}
+.athlete{position:absolute;bottom:10px;width:42px;height:86px;}
+.athlete .head{position:absolute;top:0;left:11px;width:20px;height:20px;border-radius:50%;background:var(--moon);}
+.athlete .torso{position:absolute;top:20px;left:13px;width:16px;height:28px;border-radius:10px;background:#f0debe;}
+.athlete .arm{position:absolute;top:30px;width:6px;height:22px;background:#f0debe;transform-origin:top center;animation:armPump 1s ease-in-out infinite;}
+.athlete .arm.left{left:6px;animation-delay:.1s;}
+.athlete .arm.right{right:6px;animation-delay:.5s;}
+.athlete .leg{position:absolute;top:48px;width:7px;height:30px;background:#d9c29b;transform-origin:top center;animation:legRun 1s ease-in-out infinite;}
+.athlete .leg.left{left:12px;}
+.athlete .leg.right{right:12px;animation-delay:.5s;}
+.athlete.female .torso{background:#ffd1d8;}
+.athlete.female .head::after{content:'';position:absolute;right:-2px;top:3px;width:10px;height:10px;border-radius:40% 60% 45% 55%;background:#8a5f4f;}
+.athlete.male .torso{background:#bad3ff;}
+.athlete.male .head::after{content:'';position:absolute;left:2px;top:-1px;width:14px;height:7px;border-radius:6px 6px 2px 2px;background:#4f3e36;}
+.athlete.one{left:50%;transform:translateX(-50%);}
+.athlete.lefty{left:24%;}
+.athlete.righty{right:24%;}
+.tread{position:absolute;left:12px;right:12px;bottom:4px;height:5px;background:linear-gradient(90deg,rgba(200,185,154,.3),rgba(200,185,154,.1));}
+@keyframes armPump{0%,100%{transform:rotate(28deg);}50%{transform:rotate(-28deg);}}
+@keyframes legRun{0%,100%{transform:rotate(-22deg);}50%{transform:rotate(20deg);}}
 
 /* Footer */
 footer{background:#030304;padding:80px 48px 40px;}
@@ -157,6 +194,7 @@ footer{background:#030304;padding:80px 48px 40px;}
   .auth-link{order:2;}
   .cart-link{order:3;}
   .nav-cta{display:none;}
+  .audience-nav{order:4;width:100%;}
   .footer-top{grid-template-columns:1fr 1fr;gap:28px;}
   .footer-bottom{flex-direction:column;gap:16px;}
   .ai-fab{width:58px;height:58px;right:16px;bottom:16px;}
@@ -168,6 +206,7 @@ footer{background:#030304;padding:80px 48px 40px;}
 @media(max-width:600px){
   .lang-btn{padding:4px 8px;font-size:9px;}
   .auth-link,.cart-link,.user-greeting{font-size:9px;letter-spacing:.08em;}
+  .audience-link{font-size:8px;padding:5px 6px;}
   .user-greeting{display:none;}
   footer{padding:64px 20px 28px;}
   .footer-top{grid-template-columns:1fr;gap:22px;padding-bottom:36px;}
@@ -177,6 +216,9 @@ footer{background:#030304;padding:80px 48px 40px;}
   .summer-actions{display:grid;grid-template-columns:1fr;}
   .summer-btn,.summer-skip{text-align:center;}
   .summer-skip{position:static;margin-top:10px;}
+  .audience-shell{padding:16px 12px;}
+  .audience-grid{grid-template-columns:1fr;}
+  .audience-card{min-height:186px;}
 }
 @media(hover:none),(pointer:coarse){
   body{cursor:auto;}
@@ -208,6 +250,35 @@ footer{background:#030304;padding:80px 48px 40px;}
       <a href="#newsletterBlock" class="summer-btn primary" data-close-summer>{% if lang == 'ar' %}انضم الآن{% elif lang == 'fr' %}S'inscrire{% else %}Get Early Access{% endif %}</a>
       <a href="{{ site.instagram_url }}" target="_blank" rel="noopener" class="summer-btn">{% if lang == 'ar' %}اترك مراجعة{% elif lang == 'fr' %}Laisser un avis{% else %}Leave a Review{% endif %}</a>
       <button type="button" class="summer-skip" data-close-summer>{% if lang == 'ar' %}تخطي{% elif lang == 'fr' %}Passer{% else %}Skip{% endif %}</button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if request.user.is_authenticated or request.session.guest_allowed %}
+<div class="audience-gate" id="audienceGate">
+  <div class="audience-shell" role="dialog" aria-modal="true" aria-label="Audience selection">
+    <div class="audience-head">
+      <span class="audience-kicker">{% if lang == 'ar' %}اختر أسلوبك{% elif lang == 'fr' %}Choisissez votre style{% else %}Choose your lane{% endif %}</span>
+      <h2 class="audience-title">{% if lang == 'ar' %}لمن تتسوق اليوم؟{% elif lang == 'fr' %}Pour qui faites-vous vos achats ?{% else %}Who are you shopping for?{% endif %}</h2>
+      <p class="audience-sub">{% if lang == 'ar' %}اختر مرة واحدة ويمكنك التبديل لاحقاً من الشريط العلوي.{% elif lang == 'fr' %}Choisissez maintenant et changez plus tard depuis la barre en haut.{% else %}Choose now and switch anytime from the top bar.{% endif %}</p>
+    </div>
+    <div class="audience-grid">
+      <a class="audience-card" href="{% url 'set_audience' 'him' %}?next={{ request.get_full_path|urlencode }}">
+        <span class="audience-label">{% if lang == 'ar' %}له{% elif lang == 'fr' %}Pour Lui{% else %}For Him{% endif %}</span>
+        <span class="audience-meta">{% if lang == 'ar' %}تدريب قوي{% elif lang == 'fr' %}Entraînement intensif{% else %}Power Training{% endif %}</span>
+        <div class="workout-stage"><div class="athlete male one"><span class="head"></span><span class="torso"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span></div><span class="tread"></span></div>
+      </a>
+      <a class="audience-card" href="{% url 'set_audience' 'her' %}?next={{ request.get_full_path|urlencode }}">
+        <span class="audience-label">{% if lang == 'ar' %}لها{% elif lang == 'fr' %}Pour Elle{% else %}For Her{% endif %}</span>
+        <span class="audience-meta">{% if lang == 'ar' %}حركة وأناقة{% elif lang == 'fr' %}Mouvement et style{% else %}Movement + Style{% endif %}</span>
+        <div class="workout-stage"><div class="athlete female one"><span class="head"></span><span class="torso"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span></div><span class="tread"></span></div>
+      </a>
+      <a class="audience-card" href="{% url 'set_audience' 'all' %}?next={{ request.get_full_path|urlencode }}">
+        <span class="audience-label">{% if lang == 'ar' %}للجميع{% elif lang == 'fr' %}Pour Tous{% else %}For All{% endif %}</span>
+        <span class="audience-meta">{% if lang == 'ar' %}هو وهي{% elif lang == 'fr' %}Lui + Elle{% else %}Him + Her{% endif %}</span>
+        <div class="workout-stage"><div class="athlete male lefty"><span class="head"></span><span class="torso"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span></div><div class="athlete female righty"><span class="head"></span><span class="torso"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span></div><span class="tread"></span></div>
+      </a>
     </div>
   </div>
 </div>
@@ -265,6 +336,11 @@ footer{background:#030304;padding:80px 48px 40px;}
       {% if lang == 'ar' %}حقيبة{% elif lang == 'fr' %}Sac{% else %}Bag{% endif %}
       <span class="cart-badge" id="cartBadge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span>
     </a>
+    <div class="audience-nav">
+      <a class="audience-link {% if preferred_audience == 'all' %}active{% endif %}" href="{% url 'set_audience' 'all' %}?next={{ request.get_full_path|urlencode }}">{% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tous{% else %}All{% endif %}</a>
+      <a class="audience-link {% if preferred_audience == 'him' %}active{% endif %}" href="{% url 'set_audience' 'him' %}?next={{ request.get_full_path|urlencode }}">{% if lang == 'ar' %}له{% elif lang == 'fr' %}Homme{% else %}Men{% endif %}</a>
+      <a class="audience-link {% if preferred_audience == 'her' %}active{% endif %}" href="{% url 'set_audience' 'her' %}?next={{ request.get_full_path|urlencode }}">{% if lang == 'ar' %}لها{% elif lang == 'fr' %}Femme{% else %}Women{% endif %}</a>
+    </div>
     <a href="{% url 'shop' %}" class="nav-cta">{% site_t site 'nav_shopnow' lang %}</a>
   </div>
 </nav>
@@ -413,12 +489,18 @@ if(aiFab){
 startAiIdleTimer();
 // Launch notice popup
 const summerNotice=document.getElementById('summerNotice');
+const audienceGate=document.getElementById('audienceGate');
+const hasAudienceSelected={{ has_audience_selected|yesno:"true,false" }};
+const showAudienceGate=()=>{if(audienceGate){audienceGate.classList.add('show');}};
 if(summerNotice){
   const key='mb_summer_notice_dismissed';
-  const closeNotice=()=>{summerNotice.classList.remove('show');localStorage.setItem(key,'1');};
+  const closeNotice=()=>{summerNotice.classList.remove('show');localStorage.setItem(key,'1');if(!hasAudienceSelected){setTimeout(showAudienceGate,260);}};
   if(!localStorage.getItem(key)){setTimeout(()=>summerNotice.classList.add('show'),420);}
+  else if(!hasAudienceSelected){setTimeout(showAudienceGate,460);}
   summerNotice.addEventListener('click',e=>{if(e.target===summerNotice)closeNotice();});
   summerNotice.querySelectorAll('[data-close-summer]').forEach(btn=>btn.addEventListener('click',closeNotice));
+} else if(!hasAudienceSelected){
+  setTimeout(showAudienceGate,420);
 }
 </script>
 {% block extra_js %}{% endblock %}

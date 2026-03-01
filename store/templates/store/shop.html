@@ -10,6 +10,9 @@
 .filter-label{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);}
 .filter-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 16px;border:1px solid transparent;transition:all .2s;cursor:none;}
 .filter-btn:hover,.filter-btn.active{color:var(--moon);border-color:rgba(200,185,154,.3);}
+.audience-filter{display:flex;align-items:center;gap:8px;margin-left:10px;}
+.audience-pill{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 10px;border:1px solid rgba(200,185,154,.18);transition:all .2s;cursor:none;}
+.audience-pill.active,.audience-pill:hover{color:var(--moon);border-color:rgba(200,185,154,.35);background:rgba(200,185,154,.08);}
 .sort-select{margin-left:auto;background:transparent;border:1px solid rgba(200,185,154,.2);color:var(--white);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;padding:8px 16px;cursor:none;outline:none;}
 .sort-select option{background:var(--dim);}
 .section-filter-bar{display:flex;align-items:center;gap:10px;padding:12px 48px;background:rgba(10,10,14,.92);border-bottom:1px solid rgba(200,185,154,.06);flex-wrap:wrap;}
@@ -30,13 +33,15 @@
 .empty-state{padding:120px 48px;text-align:center;color:var(--muted);}
 .empty-state h3{font-family:'Bebas Neue';font-size:48px;letter-spacing:.05em;color:var(--white);margin-bottom:16px;}
 {% if is_rtl %}.shop-header,.filter-bar,.section-filter-bar{direction:rtl;}.sort-select{margin-left:0;margin-right:auto;}.product-tag{left:auto;right:16px;}{% endif %}
-@media(max-width:900px){.shop-header{padding:120px 24px 40px;}.filter-bar,.section-filter-bar{padding:16px 24px;}.shop-grid{grid-template-columns:1fr 1fr;}.sort-select{margin-left:0;}}
+@media(max-width:900px){.shop-header{padding:120px 24px 40px;}.filter-bar,.section-filter-bar{padding:16px 24px;}.shop-grid{grid-template-columns:1fr 1fr;}.sort-select{margin-left:0;}.audience-filter{width:100%;margin-left:0;}}
 @media(max-width:600px){
   .shop-header{padding:96px 16px 28px;}
   .filter-bar,.section-filter-bar{padding:12px 16px;gap:8px;}
   .filter-label{width:100%;}
+  .audience-filter{width:100%;margin-left:0;}
   .section-filter-label{width:100%;}
   .filter-btn{padding:6px 10px;font-size:10px;letter-spacing:.08em;}
+  .audience-pill{padding:6px 8px;font-size:9px;letter-spacing:.06em;}
   .section-filter-btn{padding:6px 10px;font-size:9px;letter-spacing:.08em;}
   .sort-select{width:100%;margin:8px 0 0;}
   .shop-grid{grid-template-columns:1fr;}
@@ -55,11 +60,16 @@
 
 <div class="filter-bar" {% if is_rtl %}dir="rtl"{% endif %}>
   <span class="filter-label">{% if lang == 'ar' %}تصفية:{% elif lang == 'fr' %}Filtrer:{% else %}Filter:{% endif %}</span>
-  <a href="{% url 'shop' %}{% if sort %}?sort={{ sort }}{% endif %}" class="filter-btn {% if not selected_category %}active{% endif %}">{% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tout{% else %}All{% endif %}</a>
+  <a href="{% url 'shop' %}{% if sort or audience and audience != 'all' %}?{% endif %}{% if sort %}sort={{ sort }}{% endif %}{% if sort and audience and audience != 'all' %}&{% endif %}{% if audience and audience != 'all' %}audience={{ audience }}{% endif %}" class="filter-btn {% if not selected_category %}active{% endif %}">{% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tout{% else %}All{% endif %}</a>
   {% for cat in all_categories %}
-  <a href="{% url 'shop' %}?category={{ cat.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="filter-btn {% if selected_category.slug == cat.slug %}active{% endif %}">{{ cat.name|t:lang }}</a>
+  <a href="{% url 'shop' %}?category={{ cat.slug }}{% if sort %}&sort={{ sort }}{% endif %}{% if audience and audience != 'all' %}&audience={{ audience }}{% endif %}" class="filter-btn {% if selected_category.slug == cat.slug %}active{% endif %}">{{ cat.name|t:lang }}</a>
   {% endfor %}
-  <select class="sort-select" onchange="location='?{% if selected_category_param %}category={{ selected_category_param }}&{% elif selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}sort='+this.value">
+  <div class="audience-filter">
+    <a href="?{% if selected_category_param %}category={{ selected_category_param }}&{% elif selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}{% if sort %}sort={{ sort }}&{% endif %}audience=all" class="audience-pill {% if audience == 'all' %}active{% endif %}">{% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tous{% else %}All{% endif %}</a>
+    <a href="?{% if selected_category_param %}category={{ selected_category_param }}&{% elif selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}{% if sort %}sort={{ sort }}&{% endif %}audience=him" class="audience-pill {% if audience == 'him' %}active{% endif %}">{% if lang == 'ar' %}له{% elif lang == 'fr' %}Homme{% else %}Men{% endif %}</a>
+    <a href="?{% if selected_category_param %}category={{ selected_category_param }}&{% elif selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}{% if sort %}sort={{ sort }}&{% endif %}audience=her" class="audience-pill {% if audience == 'her' %}active{% endif %}">{% if lang == 'ar' %}لها{% elif lang == 'fr' %}Femme{% else %}Women{% endif %}</a>
+  </div>
+  <select class="sort-select" onchange="location='?{% if selected_category_param %}category={{ selected_category_param }}&{% elif selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_section %}section={{ selected_section.slug }}&{% endif %}{% if audience %}audience={{ audience }}&{% endif %}sort='+this.value">
     <option value="new" {% if sort == 'new' %}selected{% endif %}>{% if lang == 'ar' %}الأحدث{% elif lang == 'fr' %}Nouveautés{% else %}Newest{% endif %}</option>
     <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأقل{% elif lang == 'fr' %}Prix croissant{% else %}Price: Low to High{% endif %}</option>
     <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>{% if lang == 'ar' %}السعر: الأعلى{% elif lang == 'fr' %}Prix décroissant{% else %}Price: High to Low{% endif %}</option>
@@ -70,11 +80,11 @@
 {% if selected_category and available_sections %}
 <div class="section-filter-bar" {% if is_rtl %}dir="rtl"{% endif %}>
   <span class="section-filter-label">{% if lang == 'ar' %}الأقسام:{% elif lang == 'fr' %}Sections:{% else %}Sections:{% endif %}</span>
-  <a href="{% url 'shop' %}?category={% if selected_category_param %}{{ selected_category_param }}{% else %}{{ selected_category.slug }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if not selected_section %}active{% endif %}">
+  <a href="{% url 'shop' %}?category={% if selected_category_param %}{{ selected_category_param }}{% else %}{{ selected_category.slug }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if audience and audience != 'all' %}&audience={{ audience }}{% endif %}" class="section-filter-btn {% if not selected_section %}active{% endif %}">
     {% if lang == 'ar' %}الكل{% elif lang == 'fr' %}Tout{% else %}All{% endif %}
   </a>
   {% for section in available_sections %}
-  <a href="{% url 'shop' %}?category={% if selected_category_param %}{{ selected_category_param }}{% else %}{{ selected_category.slug }}{% endif %}&section={{ section.slug }}{% if sort %}&sort={{ sort }}{% endif %}" class="section-filter-btn {% if selected_section and selected_section.slug == section.slug %}active{% endif %}">
+  <a href="{% url 'shop' %}?category={% if selected_category_param %}{{ selected_category_param }}{% else %}{{ selected_category.slug }}{% endif %}&section={{ section.slug }}{% if sort %}&sort={{ sort }}{% endif %}{% if audience and audience != 'all' %}&audience={{ audience }}{% endif %}" class="section-filter-btn {% if selected_section and selected_section.slug == section.slug %}active{% endif %}">
     {{ section.name|t:lang }}
   </a>
   {% endfor %}
