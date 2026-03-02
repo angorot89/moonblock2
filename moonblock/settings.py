@@ -5,6 +5,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'moonblock-secret-key-change-in-production-2026'
 DEBUG = True
 ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "0.0.0.0",
     "moonblock2-production.up.railway.app",
     "moonblockstreetwear.com",
     "www.moonblockstreetwear.com",

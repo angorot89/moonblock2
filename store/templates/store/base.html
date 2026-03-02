@@ -115,57 +115,55 @@ nav::before{content:'';position:absolute;inset:0;background:linear-gradient(to b
 .audience-label{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;letter-spacing:.03em;color:var(--white);}
 .audience-meta{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--moon);display:block;margin-top:8px;}
 .workout-stage{position:absolute;left:14px;right:14px;bottom:10px;height:148px;border:1px solid rgba(200,185,154,.16);background:radial-gradient(circle at 24% 14%,rgba(200,185,154,.2),transparent 42%),linear-gradient(180deg,rgba(200,185,154,.1),rgba(200,185,154,.02));overflow:hidden;}
-.workout-stage::before{content:'';position:absolute;left:0;right:0;bottom:16px;height:2px;background:rgba(200,185,154,.22);}
-.toon-scene{position:absolute;inset:0;}
-.bench{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:92px;height:14px;border-radius:8px;background:linear-gradient(180deg,#5d6478,#3b4152);}
-.bench::before{content:'';position:absolute;left:8px;right:8px;bottom:-8px;height:8px;border-radius:0 0 6px 6px;background:#2d3340;}
-.rack{position:absolute;left:50%;transform:translateX(-50%);bottom:32px;width:120px;height:74px;}
-.rack::before,.rack::after{content:'';position:absolute;bottom:0;width:6px;height:74px;background:#6a7186;border-radius:4px;}
+.workout-stage::before{content:'';position:absolute;left:0;right:0;bottom:14px;height:2px;background:rgba(200,185,154,.2);}
+.fit-scene{position:absolute;inset:0;}
+.bench{position:absolute;left:50%;bottom:23px;transform:translateX(-50%);width:98px;height:14px;border-radius:9px;background:linear-gradient(180deg,#5f6572,#3a3f4a);}
+.bench::before{content:'';position:absolute;left:12px;right:12px;bottom:-9px;height:9px;border-radius:0 0 7px 7px;background:#2a2e38;}
+.rack{position:absolute;left:50%;transform:translateX(-50%);bottom:36px;width:132px;height:78px;}
+.rack::before,.rack::after{content:'';position:absolute;bottom:0;width:6px;height:78px;background:#70798d;border-radius:4px;}
 .rack::before{left:0;}
 .rack::after{right:0;}
-.barbell{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:84px;height:8px;border-radius:8px;background:#d5dfef;animation:pressBar 1.4s ease-in-out infinite;}
-.barbell::before,.barbell::after{content:'';position:absolute;top:-4px;width:8px;height:16px;border-radius:4px;background:#8d97ae;}
-.barbell::before{left:-8px;}
-.barbell::after{right:-8px;}
-.plate{position:absolute;top:-7px;width:12px;height:22px;border-radius:5px;background:#c8b99a;}
-.plate.left{left:-18px;}
-.plate.right{right:-18px;}
-.cat{position:absolute;left:50%;bottom:24px;width:64px;height:78px;transform:translateX(-50%);}
-.cat .head{position:absolute;left:19px;top:0;width:26px;height:24px;border-radius:50%;background:#8f98ab;box-shadow:inset -2px -3px rgba(0,0,0,.15);}
-.cat .ear{position:absolute;top:-6px;width:10px;height:10px;background:#8f98ab;transform:rotate(45deg);}
-.cat .ear.left{left:17px;}
-.cat .ear.right{right:17px;}
-.cat .eye{position:absolute;top:10px;width:4px;height:4px;border-radius:50%;background:#f6f1e7;}
-.cat .eye.left{left:27px;}
-.cat .eye.right{right:27px;}
-.cat .body{position:absolute;left:22px;top:20px;width:20px;height:30px;border-radius:12px;background:#6d768f;}
-.cat .arm{position:absolute;top:28px;width:6px;height:22px;border-radius:8px;background:#9aa3b8;transform-origin:top center;animation:catArm 1.4s ease-in-out infinite;}
-.cat .arm.left{left:16px;animation-delay:.05s;}
-.cat .arm.right{right:16px;animation-delay:.05s;}
-.cat .leg{position:absolute;top:50px;width:8px;height:22px;border-radius:8px;background:#8b95ab;animation:catLeg 1.4s ease-in-out infinite;}
-.cat .leg.left{left:22px;}
-.cat .leg.right{right:22px;}
-.cat.female .head{background:#a57d93;}
-.cat.female .ear{background:#a57d93;}
-.cat.female .body{background:#e9a8bf;}
-.cat.female .arm,.cat.female .leg{background:#efbfd0;}
-.cat.female .bow{position:absolute;left:26px;top:4px;width:12px;height:8px;background:#ffe5ee;border-radius:8px;}
-.cat.female .bow::before,.cat.female .bow::after{content:'';position:absolute;top:-2px;width:6px;height:6px;background:#ffe5ee;border-radius:50%;}
-.cat.female .bow::before{left:-4px;}
-.cat.female .bow::after{right:-4px;}
-.cat.male .body{background:#8fb2e4;}
-.cat.male .arm,.cat.male .leg{background:#bfd1ee;}
-.cat .tail{position:absolute;right:10px;top:38px;width:18px;height:8px;border-radius:8px;background:#7b859d;transform-origin:left center;animation:tailWave 1.4s ease-in-out infinite;}
-.cat.female .tail{background:#c08ca4;}
-.scene-duo .cat.male{transform:translateX(-80%);}
-.scene-duo .cat.female{transform:translateX(-20%);}
-.scene-duo .cat.female .body{background:#f0b2c8;}
-.shadow{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:90px;height:10px;background:radial-gradient(ellipse at center,rgba(0,0,0,.42),transparent 70%);animation:shadowPulse 1.4s ease-in-out infinite;}
-@keyframes pressBar{0%,100%{transform:translateX(-50%) translateY(0);}45%{transform:translateX(-50%) translateY(18px);}55%{transform:translateX(-50%) translateY(18px);}}
-@keyframes catArm{0%,100%{transform:rotate(14deg) translateY(0);}45%,55%{transform:rotate(-12deg) translateY(16px);}}
-@keyframes catLeg{0%,100%{transform:translateY(0);}45%,55%{transform:translateY(2px);}}
-@keyframes tailWave{0%,100%{transform:rotate(10deg);}50%{transform:rotate(-10deg);}}
-@keyframes shadowPulse{0%,100%{opacity:.35;transform:translateX(-50%) scaleX(1);}50%{opacity:.2;transform:translateX(-50%) scaleX(1.12);}}
+.bar{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:90px;height:8px;border-radius:8px;background:#d8e1f1;animation:barPress 1.35s ease-in-out infinite;}
+.plate{position:absolute;top:-7px;width:13px;height:22px;border-radius:6px;background:#c8b99a;}
+.plate.left{left:-16px;}
+.plate.right{right:-16px;}
+.lifter{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:72px;height:88px;}
+.lifter .head{position:absolute;left:27px;top:2px;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#ffdcb6 0%,#cb9a67 72%,#8b613b 100%);}
+.lifter .torso{position:absolute;left:28px;top:19px;width:16px;height:26px;border-radius:10px;background:linear-gradient(180deg,#d1d9e8,#8a98ad);}
+.lifter .hip{position:absolute;left:26px;top:44px;width:20px;height:8px;border-radius:8px;background:#7b879a;}
+.lifter .thigh{position:absolute;top:50px;width:8px;height:20px;border-radius:8px;background:#7f8ca1;}
+.lifter .thigh.left{left:24px;}
+.lifter .thigh.right{right:24px;}
+.lifter .shin{position:absolute;top:66px;width:7px;height:17px;border-radius:7px;background:#a5b3c8;}
+.lifter .shin.left{left:23px;}
+.lifter .shin.right{right:23px;}
+.lifter .arm{position:absolute;top:20px;width:7px;height:26px;border-radius:8px;background:#d1b08b;transform-origin:top center;animation:armDrive 1.35s ease-in-out infinite;}
+.lifter .arm.left{left:18px;}
+.lifter .arm.right{right:18px;}
+.lifter .fore{position:absolute;top:42px;width:7px;height:24px;border-radius:8px;background:#c79b6f;transform-origin:top center;animation:foreDrive 1.35s ease-in-out infinite;}
+.lifter .fore.left{left:14px;}
+.lifter .fore.right{right:14px;}
+.lifter .shoe{position:absolute;bottom:0;width:16px;height:7px;border-radius:8px;background:#d8d0c1;}
+.lifter .shoe.left{left:16px;}
+.lifter .shoe.right{right:16px;}
+.lifter.male .torso{background:linear-gradient(180deg,#bed2f2,#708db8);}
+.lifter.female .torso{background:linear-gradient(180deg,#ffd0de,#e990aa);}
+.lifter.female .thigh,.lifter.female .shin{background:#e8b1c3;}
+.scene-duo .lifter{bottom:19px;animation:riseDip 1.35s ease-in-out infinite;}
+.scene-duo .lifter.male{left:35%;}
+.scene-duo .lifter.female{left:65%;}
+.scene-duo .bench,.scene-duo .rack,.scene-duo .bar,.scene-duo .plate{display:none;}
+.db{position:absolute;top:34px;width:8px;height:24px;border-radius:8px;background:#c4cedf;animation:curl 1.15s ease-in-out infinite;}
+.db.left{left:14px;}
+.db.right{right:14px;}
+.floor-shadow{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:95px;height:10px;background:radial-gradient(ellipse at center,rgba(0,0,0,.42),transparent 70%);animation:shadowPulse 1.35s ease-in-out infinite;}
+.scene-duo .floor-shadow{width:120px;}
+@keyframes barPress{0%,100%{transform:translateX(-50%) translateY(0);}46%,56%{transform:translateX(-50%) translateY(17px);}}
+@keyframes armDrive{0%,100%{transform:rotate(22deg);}46%,56%{transform:rotate(-14deg);}}
+@keyframes foreDrive{0%,100%{transform:rotate(-12deg);}46%,56%{transform:rotate(26deg);}}
+@keyframes shadowPulse{0%,100%{opacity:.36;transform:translateX(-50%) scaleX(1);}50%{opacity:.2;transform:translateX(-50%) scaleX(1.12);}}
+@keyframes riseDip{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,-3px);}}
+@keyframes curl{0%,100%{transform:rotate(8deg);}50%{transform:rotate(-20deg);}}
 
 /* Footer */
 footer{background:#030304;padding:80px 48px 40px;}
@@ -300,13 +298,15 @@ footer{background:#030304;padding:80px 48px 40px;}
         <span class="audience-label">{% if lang == 'ar' %}له{% elif lang == 'fr' %}Pour Lui{% else %}For Him{% endif %}</span>
         <span class="audience-meta">{% if lang == 'ar' %}تدريب قوي{% elif lang == 'fr' %}Entraînement intensif{% else %}Power Training{% endif %}</span>
         <div class="workout-stage">
-          <div class="toon-scene scene-male">
-            <span class="shadow"></span>
+          <div class="fit-scene scene-male">
+            <span class="floor-shadow"></span>
             <span class="bench"></span>
-            <span class="rack"><span class="barbell"><span class="plate left"></span><span class="plate right"></span></span></span>
-            <span class="cat male">
-              <span class="head"></span><span class="ear left"></span><span class="ear right"></span><span class="eye left"></span><span class="eye right"></span>
-              <span class="body"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span><span class="tail"></span>
+            <span class="rack"><span class="bar"><span class="plate left"></span><span class="plate right"></span></span></span>
+            <span class="lifter male">
+              <span class="head"></span><span class="torso"></span><span class="hip"></span>
+              <span class="arm left"></span><span class="arm right"></span><span class="fore left"></span><span class="fore right"></span>
+              <span class="thigh left"></span><span class="thigh right"></span><span class="shin left"></span><span class="shin right"></span>
+              <span class="shoe left"></span><span class="shoe right"></span>
             </span>
           </div>
         </div>
@@ -315,13 +315,15 @@ footer{background:#030304;padding:80px 48px 40px;}
         <span class="audience-label">{% if lang == 'ar' %}لها{% elif lang == 'fr' %}Pour Elle{% else %}For Her{% endif %}</span>
         <span class="audience-meta">{% if lang == 'ar' %}حركة وأناقة{% elif lang == 'fr' %}Mouvement et style{% else %}Movement + Style{% endif %}</span>
         <div class="workout-stage">
-          <div class="toon-scene scene-female">
-            <span class="shadow"></span>
+          <div class="fit-scene scene-female">
+            <span class="floor-shadow"></span>
             <span class="bench"></span>
-            <span class="rack"><span class="barbell"><span class="plate left"></span><span class="plate right"></span></span></span>
-            <span class="cat female">
-              <span class="head"></span><span class="ear left"></span><span class="ear right"></span><span class="eye left"></span><span class="eye right"></span><span class="bow"></span>
-              <span class="body"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span><span class="tail"></span>
+            <span class="rack"><span class="bar"><span class="plate left"></span><span class="plate right"></span></span></span>
+            <span class="lifter female">
+              <span class="head"></span><span class="torso"></span><span class="hip"></span>
+              <span class="arm left"></span><span class="arm right"></span><span class="fore left"></span><span class="fore right"></span>
+              <span class="thigh left"></span><span class="thigh right"></span><span class="shin left"></span><span class="shin right"></span>
+              <span class="shoe left"></span><span class="shoe right"></span>
             </span>
           </div>
         </div>
@@ -330,17 +332,20 @@ footer{background:#030304;padding:80px 48px 40px;}
         <span class="audience-label">{% if lang == 'ar' %}للجميع{% elif lang == 'fr' %}Pour Tous{% else %}For All{% endif %}</span>
         <span class="audience-meta">{% if lang == 'ar' %}هو وهي{% elif lang == 'fr' %}Lui + Elle{% else %}Him + Her{% endif %}</span>
         <div class="workout-stage">
-          <div class="toon-scene scene-duo">
-            <span class="shadow"></span>
+          <div class="fit-scene scene-duo">
+            <span class="floor-shadow"></span>
             <span class="bench"></span>
-            <span class="rack"><span class="barbell"><span class="plate left"></span><span class="plate right"></span></span></span>
-            <span class="cat male">
-              <span class="head"></span><span class="ear left"></span><span class="ear right"></span><span class="eye left"></span><span class="eye right"></span>
-              <span class="body"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span><span class="tail"></span>
+            <span class="lifter male">
+              <span class="head"></span><span class="torso"></span><span class="hip"></span>
+              <span class="arm left"></span><span class="arm right"></span><span class="fore left"></span><span class="fore right"></span>
+              <span class="thigh left"></span><span class="thigh right"></span><span class="shin left"></span><span class="shin right"></span>
+              <span class="shoe left"></span><span class="shoe right"></span><span class="db left"></span><span class="db right"></span>
             </span>
-            <span class="cat female">
-              <span class="head"></span><span class="ear left"></span><span class="ear right"></span><span class="eye left"></span><span class="eye right"></span><span class="bow"></span>
-              <span class="body"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span><span class="tail"></span>
+            <span class="lifter female">
+              <span class="head"></span><span class="torso"></span><span class="hip"></span>
+              <span class="arm left"></span><span class="arm right"></span><span class="fore left"></span><span class="fore right"></span>
+              <span class="thigh left"></span><span class="thigh right"></span><span class="shin left"></span><span class="shin right"></span>
+              <span class="shoe left"></span><span class="shoe right"></span><span class="db left"></span><span class="db right"></span>
             </span>
           </div>
         </div>
