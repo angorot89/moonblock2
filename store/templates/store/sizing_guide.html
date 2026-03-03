@@ -1,7 +1,7 @@
 {% extends 'store/base.html' %}
 {% load moonblock_tags %}
 
-{% block title %}{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% elif lang == 'darija' %}MOONBLOCK Assistant Darija{% else %}MOONBLOCK AI Assistant{% endif %}{% endblock %}
+{% block title %}{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% else %}MOONBLOCK AI Assistant{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -50,8 +50,8 @@
       <div class="ai-head-main">
         <div class="ai-avatar">AI</div>
         <div>
-          <p class="ai-name">{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% elif lang == 'darija' %}MOONBLOCK Assistant{% else %}Moonblock Assistant{% endif %}</p>
-          <p class="ai-state">{% if lang == 'ar' %}مساعدة المقاس + التسوق + الحسابات{% elif lang == 'fr' %}Tailles + shopping + calculs{% elif lang == 'darija' %}Sizing + shopping + hesab{% else %}Sizing + shopping + calculations{% endif %}</p>
+          <p class="ai-name">{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% else %}Moonblock Assistant{% endif %}</p>
+          <p class="ai-state">{% if lang == 'ar' %}مساعدة المقاس + التسوق + الحسابات{% elif lang == 'fr' %}Tailles + shopping + calculs{% else %}Sizing + shopping + calculations{% endif %}</p>
         </div>
       </div>
       <div class="ai-lang">
@@ -89,7 +89,7 @@ const chatLangSelect=document.getElementById('chatLangSelect');
 const quickBtns=document.querySelectorAll('.quick-btn');
 const mode='{{ assistant_mode|default:"" }}';
 const lang='{{ lang }}';
-let chatLang=lang==='darija'?'darija':'en';
+let chatLang='darija';
 
 const t={
   en:{

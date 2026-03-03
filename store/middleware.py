@@ -8,7 +8,7 @@ class LanguageMiddleware:
     def __call__(self, request):
         # Check query param first, then session
         lang = request.GET.get('lang')
-        if lang in ['en', 'ar', 'fr', 'darija']:
+        if lang in ['en', 'ar', 'fr']:
             request.session['lang'] = lang
         lang = request.session.get('lang', 'en')
         request.lang = lang
