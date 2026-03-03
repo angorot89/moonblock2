@@ -308,7 +308,7 @@ def newsletter_subscribe(request):
 
 
 def set_language(request, lang):
-    if lang in ['en', 'ar', 'fr']:
+    if lang in ['en', 'ar', 'fr', 'darija']:
         request.session['lang'] = lang
     return redirect(request.META.get('HTTP_REFERER', '/'))
 

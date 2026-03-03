@@ -628,7 +628,8 @@ footer{background:#030304;padding:80px 48px 40px;}
     <div class="lang-switcher">
       <a href="{% url 'set_language' 'en' %}" class="lang-btn {% if lang == 'en' %}active{% endif %}">EN</a>
       <a href="{% url 'set_language' 'ar' %}" class="lang-btn {% if lang == 'ar' %}active{% endif %}">AR</a>
-      <a href="{% url 'set_language' 'fr' %}" class="lang-btn {% if lang == 'fr' %}active{% endif %}">FR</a>
+      
+      <a href="{% url 'set_language' 'darija' %}" class="lang-btn {% if lang == 'darija' %}active{% endif %}">DA</a>
     </div>
     {% if request.user.is_authenticated %}
     <span class="user-greeting">{% if lang == 'ar' %}مرحباً {{ request.user.first_name|default:request.user.username }}{% elif lang == 'fr' %}Salut {{ request.user.first_name|default:request.user.username }}{% else %}Hey {{ request.user.first_name|default:request.user.username }}{% endif %}</span>
@@ -737,7 +738,7 @@ footer{background:#030304;padding:80px 48px 40px;}
     <span class="ai-orbit"><span class="ai-dot"></span></span>
   </span>
 </a>
-<div class="ai-bubble" id="aiBubble">{% if lang == 'ar' %}أخبرني إذا كنت تحتاج أي مساعدة.{% elif lang == 'fr' %}Dites-moi si vous avez besoin d'aide.{% else %}Let me know if you need assistance.{% endif %}</div>
+<div class="ai-bubble" id="aiBubble">{% if lang == 'ar' %}أخبرني إذا كنت تحتاج أي مساعدة.{% elif lang == 'fr' %}Dites-moi si vous avez besoin d'aide.{% elif lang == 'darija' %}ana hna ila khasak chi haja{% else %}Let me know if you need assistance.{% endif %}</div>
 
 <script>
 // Cursor

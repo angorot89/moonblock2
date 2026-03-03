@@ -1,16 +1,20 @@
 {% extends 'store/base.html' %}
 {% load moonblock_tags %}
 
-{% block title %}{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% else %}MOONBLOCK AI Assistant{% endif %}{% endblock %}
+{% block title %}{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% elif lang == 'darija' %}MOONBLOCK Assistant Darija{% else %}MOONBLOCK AI Assistant{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>
 .ai-page{padding-top:120px;padding-bottom:90px;max-width:980px;margin:0 auto;padding-left:24px;padding-right:24px;}
 .ai-shell{border:1px solid rgba(200,185,154,.2);background:linear-gradient(180deg,#0e0f14 0%,#08090d 100%);box-shadow:0 18px 40px rgba(0,0,0,.45);}
-.ai-head{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid rgba(200,185,154,.12);}
+.ai-head{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid rgba(200,185,154,.12);justify-content:space-between;}
+.ai-head-main{display:flex;align-items:center;gap:14px;}
 .ai-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 28% 24%,#fff2d2 0%,#c8b99a 36%,#907b52 100%);color:#050507;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.08em;}
 .ai-name{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--moon);}
 .ai-state{font-size:11px;color:var(--muted);letter-spacing:.08em;}
+.ai-lang{display:flex;align-items:center;gap:8px;}
+.ai-lang-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.ai-lang-select{background:rgba(8,8,12,.9);border:1px solid rgba(200,185,154,.25);color:var(--moon);padding:8px 10px;font-size:11px;letter-spacing:.08em;outline:none;}
 .chat-log{height:460px;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
 .msg{max-width:min(82%,680px);padding:12px 14px;font-size:13px;line-height:1.7;letter-spacing:.02em;word-break:break-word;}
 .msg.bot{align-self:flex-start;border:1px solid rgba(200,185,154,.2);background:rgba(200,185,154,.08);}
@@ -24,9 +28,12 @@
 @media(max-width:900px){.chat-log{height:52vh;}}
 @media(max-width:600px){
   .ai-page{padding-top:96px;padding-left:12px;padding-right:12px;padding-bottom:56px;}
-  .ai-head{padding:12px;gap:10px;}
+  .ai-head{padding:12px;gap:10px;flex-direction:column;align-items:flex-start;}
+  .ai-head-main{width:100%;}
   .ai-name{font-size:10px;letter-spacing:.14em;}
   .ai-state{font-size:10px;line-height:1.4;}
+  .ai-lang{width:100%;justify-content:space-between;}
+  .ai-lang-select{width:140px;}
   .chat-log{height:56vh;padding:12px;}
   .msg{max-width:92%;font-size:12px;padding:10px 11px;}
   .quick-row{padding:0 12px 10px;}
@@ -40,25 +47,34 @@
 <div class="ai-page reveal" {% if is_rtl %}dir="rtl"{% endif %}>
   <div class="ai-shell">
     <div class="ai-head">
-      <div class="ai-avatar">AI</div>
-      <div>
-        <p class="ai-name">{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% else %}Moonblock Assistant{% endif %}</p>
-        <p class="ai-state">{% if lang == 'ar' %}مساعدة المقاس + التسوق + الحسابات{% elif lang == 'fr' %}Tailles + shopping + calculs{% else %}Sizing + shopping + calculations{% endif %}</p>
+      <div class="ai-head-main">
+        <div class="ai-avatar">AI</div>
+        <div>
+          <p class="ai-name">{% if lang == 'ar' %}مساعد MOONBLOCK{% elif lang == 'fr' %}Assistant MOONBLOCK{% elif lang == 'darija' %}MOONBLOCK Assistant{% else %}Moonblock Assistant{% endif %}</p>
+          <p class="ai-state">{% if lang == 'ar' %}مساعدة المقاس + التسوق + الحسابات{% elif lang == 'fr' %}Tailles + shopping + calculs{% elif lang == 'darija' %}Sizing + shopping + hesab{% else %}Sizing + shopping + calculations{% endif %}</p>
+        </div>
+      </div>
+      <div class="ai-lang">
+        <span class="ai-lang-label">AI Language</span>
+        <select id="chatLangSelect" class="ai-lang-select" aria-label="Assistant language">
+          <option value="en">English</option>
+          <option value="darija">Darija</option>
+        </select>
       </div>
     </div>
 
     <div id="chatLog" class="chat-log"></div>
 
     <div class="quick-row">
-      <button class="quick-btn" data-q="{% if lang == 'ar' %}أريد مساعدة مقاس، طولي 178 سم ووزني 74 كغ{% elif lang == 'fr' %}J'ai besoin d'aide taille, je fais 178 cm et 74 kg{% else %}I need size help, my height is 178 cm and weight is 74 kg{% endif %}">{% if lang == 'ar' %}مقاس{% elif lang == 'fr' %}Taille{% else %}Size Help{% endif %}</button>
-      <button class="quick-btn" data-q="{% if lang == 'ar' %}خذني إلى منتجات الجيم{% elif lang == 'fr' %}Emmene-moi vers les produits gym{% else %}Take me to gym products{% endif %}">{% if lang == 'ar' %}تسوق الجيم{% elif lang == 'fr' %}Shop Gym{% else %}Shop Gym{% endif %}</button>
-      <button class="quick-btn" data-q="calc 1299*3">{% if lang == 'ar' %}آلة حاسبة{% elif lang == 'fr' %}Calculatrice{% else %}Calculator{% endif %}</button>
-      <button class="quick-btn" data-q="{% if lang == 'ar' %}كيف أُكمل الدفع؟{% elif lang == 'fr' %}Comment passer au paiement ?{% else %}How do I checkout?{% endif %}">{% if lang == 'ar' %}الدفع{% elif lang == 'fr' %}Paiement{% else %}Checkout{% endif %}</button>
+      <button class="quick-btn" data-q="{% if lang == 'ar' %}أريد مساعدة مقاس، طولي 178 سم ووزني 74 كغ{% elif lang == 'fr' %}J'ai besoin d'aide taille, je fais 178 cm et 74 kg{% elif lang == 'darija' %}bghit msa3da f size, twili 178 cm w wezni 74 kg{% else %}I need size help, my height is 178 cm and weight is 74 kg{% endif %}">{% if lang == 'ar' %}مقاس{% elif lang == 'fr' %}Taille{% elif lang == 'darija' %}Size{% else %}Size Help{% endif %}</button>
+      <button class="quick-btn" data-q="{% if lang == 'ar' %}خذني إلى منتجات الجيم{% elif lang == 'fr' %}Emmene-moi vers les produits gym{% elif lang == 'darija' %}wddini l produits dyal gym{% else %}Take me to gym products{% endif %}">{% if lang == 'ar' %}تسوق الجيم{% elif lang == 'fr' %}Shop Gym{% elif lang == 'darija' %}Shop Gym{% else %}Shop Gym{% endif %}</button>
+      <button class="quick-btn" data-q="calc 1299*3">{% if lang == 'ar' %}آلة حاسبة{% elif lang == 'fr' %}Calculatrice{% elif lang == 'darija' %}Calculator{% else %}Calculator{% endif %}</button>
+      <button class="quick-btn" data-q="{% if lang == 'ar' %}كيف أُكمل الدفع؟{% elif lang == 'fr' %}Comment passer au paiement ?{% elif lang == 'darija' %}kifash nkmel checkout?{% else %}How do I checkout?{% endif %}">{% if lang == 'ar' %}الدفع{% elif lang == 'fr' %}Paiement{% elif lang == 'darija' %}Checkout{% else %}Checkout{% endif %}</button>
     </div>
 
     <form id="chatForm" class="chat-input-wrap">
-      <input id="chatInput" class="chat-input" autocomplete="off" placeholder="{% if lang == 'ar' %}اكتب رسالتك...{% elif lang == 'fr' %}Ecrivez votre message...{% else %}Type your message...{% endif %}">
-      <button class="send-btn" type="submit">{% if lang == 'ar' %}إرسال{% elif lang == 'fr' %}Envoyer{% else %}Send{% endif %}</button>
+      <input id="chatInput" class="chat-input" autocomplete="off" placeholder="{% if lang == 'ar' %}اكتب رسالتك...{% elif lang == 'fr' %}Ecrivez votre message...{% elif lang == 'darija' %}kteb msg dyalk...{% else %}Type your message...{% endif %}">
+      <button class="send-btn" type="submit">{% if lang == 'ar' %}إرسال{% elif lang == 'fr' %}Envoyer{% elif lang == 'darija' %}Send{% else %}Send{% endif %}</button>
     </form>
   </div>
 </div>
@@ -69,9 +85,11 @@
 const chatLog=document.getElementById('chatLog');
 const chatForm=document.getElementById('chatForm');
 const chatInput=document.getElementById('chatInput');
+const chatLangSelect=document.getElementById('chatLangSelect');
 const quickBtns=document.querySelectorAll('.quick-btn');
 const mode='{{ assistant_mode|default:"" }}';
 const lang='{{ lang }}';
+let chatLang=lang==='darija'?'darija':'en';
 
 const t={
   en:{
@@ -85,36 +103,51 @@ const t={
     shop:'Start shopping: <a href="/shop/">Shop All</a>. You can ask me "gym", "outerwear", or "size help".',
     fallback:'I can help with sizing, store navigation, and calculations. Try: <em>178 cm 74 kg regular</em> or <em>calc 1299*3</em>.',
     sizingInit:'Sizing mode is ready. Send your height and weight to get your fit recommendation.',
-    init:'Hi, I am your MOONBLOCK AI assistant. I can help you find products, pick sizes, and calculate totals.'
+    init:'Hi, I am your MOONBLOCK AI assistant. I can help you find products, pick sizes, and calculate totals.',
+    switchedEn:'Language switched to English.',
+    switchedDa:'Language switched to Darija.',
+    inputPlaceholder:'Type your message...'
   },
-  ar:{
-    askStats:'أرسل <strong>الطول (سم)</strong> و<strong>الوزن (كغ)</strong> مثل: <em>178 سم، 74 كغ، مقاس عادي</em>.',
-    sizeReply:(rec)=>`المقاس المقترح: <strong>${rec.main}</strong>.<br>خيار أريح: <strong>${rec.alt}</strong>.<br>BMI: ${rec.bmi}.`,
-    gym:'اذهب إلى: <a href="/shop/?category=gym">قسم الجيم</a>.',
-    street:'اذهب إلى: <a href="/shop/?category=outerwear">قسم الملابس الخارجية</a>.',
-    checkout:'رابط الدفع: <a href="/checkout/">إتمام الطلب</a>.',
-    cart:'افتح حقيبتك من هنا: <a href="/cart/">الحقيبة</a>.',
-    lookbook:'شاهد الإلهام من هنا: <a href="/lookbook/">اللوكبوك</a>.',
-    shop:'ابدأ التسوق: <a href="/shop/">كل المنتجات</a>. يمكنك أن تطلب جيم أو ملابس خارجية أو مساعدة مقاس.',
-    fallback:'أقدر أساعدك في المقاسات، التنقل داخل المتجر، والحسابات. جرّب: <em>178 سم 74 كغ عادي</em> أو <em>calc 1299*3</em>.',
-    sizingInit:'وضع المقاسات جاهز. أرسل الطول والوزن لتحصل على المقاس المناسب.',
-    init:'مرحباً، أنا مساعد MOONBLOCK الذكي. أساعدك في المقاسات، التسوق، والحسابات.'
-  },
-  fr:{
-    askStats:'Envoyez votre <strong>taille (cm)</strong> et votre <strong>poids (kg)</strong>, par exemple: <em>178 cm, 74 kg, coupe regular</em>.',
-    sizeReply:(rec)=>`Taille recommandee: <strong>${rec.main}</strong>.<br>Option plus ample: <strong>${rec.alt}</strong>.<br>IMC: ${rec.bmi}.`,
-    gym:'Allez ici: <a href="/shop/?category=gym">Collection Gym</a>.',
-    street:'Allez ici: <a href="/shop/?category=outerwear">Outerwear</a>.',
-    checkout:'Lien de paiement: <a href="/checkout/">Passer a la caisse</a>.',
-    cart:'Ouvrez votre panier ici: <a href="/cart/">Panier</a>.',
-    lookbook:'Inspiration ici: <a href="/lookbook/">Lookbook</a>.',
-    shop:'Commencez ici: <a href="/shop/">Shop All</a>. Vous pouvez demander gym, outerwear, ou aide taille.',
-    fallback:'Je peux aider pour les tailles, la navigation et les calculs. Essayez: <em>178 cm 74 kg regular</em> ou <em>calc 1299*3</em>.',
-    sizingInit:'Mode taille actif. Envoyez votre taille et votre poids pour une recommandation.',
-    init:'Bonjour, je suis votre assistant IA MOONBLOCK. Je peux aider pour le shopping, les tailles et les calculs.'
+  darija:{
+    askStats:'Sift lia <strong>twil (cm)</strong> w <strong>l wzn (kg)</strong>, bhal: <em>178 cm, 74 kg, regular fit</em>.',
+    sizeReply:(rec)=>`Size li kanans7 bik: <strong>${rec.main}</strong>.<br>Option mri7a ktar: <strong>${rec.alt}</strong>.<br>BMI: ${rec.bmi}.`,
+    gym:'Sir l hna: <a href="/shop/?category=gym">Gym Collection</a>.',
+    street:'Sir l hna: <a href="/shop/?category=outerwear">Outerwear</a>.',
+    checkout:'Lien dyal checkout: <a href="/checkout/">Proceed to Checkout</a>.',
+    cart:'7ell l bag dyalk men hna: <a href="/cart/">Cart</a>.',
+    lookbook:'Shof l lookbook men hna: <a href="/lookbook/">Lookbook</a>.',
+    shop:'Bda men hna: <a href="/shop/">Shop All</a>. Qder tgoul gym, outerwear, ola size help.',
+    fallback:'Nqder n3awnk f sizing, navigation, w l hesab. Jreb: <em>178 cm 74 kg regular</em> ola <em>calc 1299*3</em>.',
+    sizingInit:'Mode dyal sizing wajed. Sift twilk w wznek bash n3tik size monasib.',
+    init:'Salam, ana MOONBLOCK AI assistant. Ana hna ila khasak chi haja.',
+    switchedEn:'Bdelt lougha l English.',
+    switchedDa:'Bdelt lougha l Darija.',
+    inputPlaceholder:'kteb msg dyalk...'
   }
 };
-const tr=t[lang]||t.en;
+
+function tr(){
+  return t[chatLang]||t.en;
+}
+
+function syncLanguageUi(){
+  if(chatLangSelect){
+    chatLangSelect.value=chatLang;
+  }
+  if(chatInput){
+    chatInput.placeholder=tr().inputPlaceholder;
+  }
+}
+
+function setChatLanguage(nextLang,announce=true){
+  if(!['en','darija'].includes(nextLang))return false;
+  chatLang=nextLang;
+  syncLanguageUi();
+  if(announce){
+    addMsg(nextLang==='darija'?tr().switchedDa:tr().switchedEn);
+  }
+  return true;
+}
 
 function addMsg(text,role='bot'){
   const el=document.createElement('div');
@@ -170,53 +203,72 @@ function tryCalc(msg){
   return null;
 }
 
+function maybeSwitchLanguage(msg){
+  const wantsSwitch=msg.includes('change language')||msg.includes('switch language')||msg.includes('language')||msg.includes('bdel')||msg.includes('bdl')||msg.includes('lougha')||msg.includes('logha');
+  if(!wantsSwitch && !msg.includes('darija') && !msg.includes('english')) return false;
+  if(msg.includes('darija')||msg.includes('الدارجة')){
+    setChatLanguage('darija');
+    return true;
+  }
+  if(msg.includes('english')||msg.includes('anglais')){
+    setChatLanguage('en');
+    return true;
+  }
+  return false;
+}
+
 function botReply(input){
   const msg=input.toLowerCase().trim();
   if(!msg)return;
+
+  if(maybeSwitchLanguage(msg)){
+    return;
+  }
+
   const calc=msg.startsWith('calc')||/^[0-9+\-*/().% ]+$/.test(msg)?tryCalc(msg):null;
   if(calc){
     addMsg(calc);
     return;
   }
 
-  if(msg.includes('size')||msg.includes('taille')||msg.includes('مقاس')||msg.includes('height')||msg.includes('weight')||msg.includes('cm')||msg.includes('kg')||msg.includes('طول')||msg.includes('وزن')){
+  if(msg.includes('size')||msg.includes('taille')||msg.includes('مقاس')||msg.includes('height')||msg.includes('weight')||msg.includes('cm')||msg.includes('kg')||msg.includes('طول')||msg.includes('وزن')||msg.includes('twil')||msg.includes('wzn')){
     const data=parseNumbers(msg);
     if(!data){
-      addMsg(tr.askStats);
+      addMsg(tr().askStats);
       return;
     }
     const fit=parseFit(msg);
     const rec=recommendSize(data.height,data.weight,fit);
-    addMsg(tr.sizeReply(rec));
+    addMsg(tr().sizeReply(rec));
     return;
   }
 
   if(msg.includes('gym')||msg.includes('جيم')){
-    addMsg(tr.gym);
+    addMsg(tr().gym);
     return;
   }
   if(msg.includes('outerwear')||msg.includes('ملابس خارجية')||msg.includes('street')||msg.includes('ستريت')){
-    addMsg(tr.street);
+    addMsg(tr().street);
     return;
   }
-  if(msg.includes('checkout')||msg.includes('pay')||msg.includes('paiement')||msg.includes('caisse')||msg.includes('دفع')){
-    addMsg(tr.checkout);
+  if(msg.includes('checkout')||msg.includes('pay')||msg.includes('paiement')||msg.includes('caisse')||msg.includes('دفع')||msg.includes('khalas')){
+    addMsg(tr().checkout);
     return;
   }
   if(msg.includes('cart')||msg.includes('bag')||msg.includes('panier')||msg.includes('حقيبة')||msg.includes('سلة')){
-    addMsg(tr.cart);
+    addMsg(tr().cart);
     return;
   }
   if(msg.includes('lookbook')||msg.includes('لوكبوك')){
-    addMsg(tr.lookbook);
+    addMsg(tr().lookbook);
     return;
   }
-  if(msg.includes('shop')||msg.includes('buy')||msg.includes('product')||msg.includes('produit')||msg.includes('تسوق')||msg.includes('منتج')){
-    addMsg(tr.shop);
+  if(msg.includes('shop')||msg.includes('buy')||msg.includes('product')||msg.includes('produit')||msg.includes('تسوق')||msg.includes('منتج')||msg.includes('chri')){
+    addMsg(tr().shop);
     return;
   }
 
-  addMsg(tr.fallback);
+  addMsg(tr().fallback);
 }
 
 chatForm.addEventListener('submit',e=>{
@@ -234,10 +286,16 @@ quickBtns.forEach(btn=>btn.addEventListener('click',()=>{
   setTimeout(()=>botReply(q),120);
 }));
 
+if(chatLangSelect){
+  chatLangSelect.addEventListener('change',e=>setChatLanguage(e.target.value));
+}
+
+syncLanguageUi();
+
 if(mode==='sizing'){
-  addMsg(tr.sizingInit);
+  addMsg(tr().sizingInit);
 }else{
-  addMsg(tr.init);
+  addMsg(tr().init);
 }
 </script>
 {% endblock %}
