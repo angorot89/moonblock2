@@ -1,12 +1,44 @@
-from django.contrib import admin
+import csv
+
+from django.contrib import admin, messages
+from django.conf import settings
 from django import forms
+from django.core.mail import send_mail
 from django.urls import path
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.utils import timezone
 from django.utils.html import format_html
 from .models import (
     SiteSettings, Category, OuterwearSection, Product, LookbookItem,
     Order, OrderItem, NewsletterSubscriber
 )
+
+
+# ─── ADMIN EXPORT MIXIN ──────────────────────────────────────────────────────
+
+class ExcelExportMixin:
+    export_fields = ()
+    export_filename_prefix = 'export'
+
+    @admin.action(description='Export selected to Excel (CSV)')
+    def export_as_excel(self, request, queryset):
+        timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'{self.export_filename_prefix}_{timestamp}.csv'
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response.write('\ufeff')
+        writer = csv.writer(response)
+        writer.writerow(self.export_fields)
+        for obj in queryset.iterator():
+            row = [self._serialize_export_value(getattr(obj, field, '')) for field in self.export_fields]
+            writer.writerow(row)
+        return response
+
+    @staticmethod
+    def _serialize_export_value(value):
+        if value is None:
+            return ''
+        return str(value)
 
 
 # ─── SITE SETTINGS ───────────────────────────────────────────────────────────
@@ -157,7 +189,7 @@ class ProductAdminForm(forms.ModelForm):
 # ─── PRODUCT ────────────────────────────────────────────────────────────────
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ExcelExportMixin, admin.ModelAdmin):
     form = ProductAdminForm
     list_display = ['image_preview', 'name_en', 'category', 'section', 'target_audience', 'price', 'stock', 'is_active', 'is_featured', 'is_new']
     list_display_links = ['name_en']
@@ -166,6 +198,13 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name_en', 'name_ar', 'name_fr']
     prepopulated_fields = {'slug': ('name_en',)}
     readonly_fields = ['image_preview', 'created_at', 'updated_at']
+    actions = ['export_as_excel']
+    export_filename_prefix = 'products'
+    export_fields = (
+        'id', 'name_en', 'name_ar', 'name_fr', 'slug', 'category', 'section', 'target_audience',
+        'price', 'compare_price', 'stock', 'available_sizes', 'is_active', 'is_featured', 'is_new',
+        'created_at', 'updated_at'
+    )
 
     fieldsets = (
         ('Product Name (all languages)', {
@@ -260,13 +299,19 @@ class OrderItemInline(admin.TabularInline):
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ExcelExportMixin, admin.ModelAdmin):
     list_display = ['id', 'first_name', 'last_name', 'email', 'total_display', 'status', 'created_at']
     list_filter = ['status', 'created_at']
     search_fields = ['first_name', 'last_name', 'email']
     list_editable = ['status']
     readonly_fields = ['total', 'created_at', 'updated_at']
     inlines = [OrderItemInline]
+    actions = ['export_as_excel']
+    export_filename_prefix = 'orders'
+    export_fields = (
+        'id', 'first_name', 'last_name', 'email', 'phone', 'address', 'city', 'country',
+        'postal_code', 'status', 'total', 'notes', 'created_at', 'updated_at'
+    )
 
     fieldsets = (
         ('Customer', {'fields': (('first_name', 'last_name'), 'email', 'phone')}),
@@ -278,9 +323,46 @@ class OrderAdmin(admin.ModelAdmin):
         return f"${obj.total:.2f}"
     total_display.short_description = 'Total'
 
+    def save_model(self, request, obj, form, change):
+        previous_status = None
+        if change and obj.pk:
+            previous_status = Order.objects.filter(pk=obj.pk).values_list('status', flat=True).first()
+
+        super().save_model(request, obj, form, change)
+
+        if change and previous_status and previous_status != obj.status and obj.email:
+            self._send_status_email(request, obj)
+
+    def _send_status_email(self, request, order):
+        status_label = order.get_status_display()
+        subject = f"Your Moonblock order #{order.id} is now {status_label}"
+        body = (
+            f"Hi {order.first_name},\n\n"
+            f"Your order #{order.id} status has been updated to: {status_label}.\n\n"
+            f"Thank you for shopping with Moonblock."
+        )
+        try:
+            send_mail(
+                subject=subject,
+                message=body,
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+                recipient_list=[order.email],
+                fail_silently=False,
+            )
+            self.message_user(request, f"Status email sent to {order.email}.", level=messages.SUCCESS)
+        except Exception as exc:
+            self.message_user(
+                request,
+                f"Order updated, but status email could not be sent ({exc}). Configure EMAIL settings.",
+                level=messages.WARNING
+            )
+
 
 @admin.register(NewsletterSubscriber)
-class NewsletterAdmin(admin.ModelAdmin):
+class NewsletterAdmin(ExcelExportMixin, admin.ModelAdmin):
     list_display = ['email', 'subscribed_at', 'is_active']
     list_filter = ['is_active']
     readonly_fields = ['subscribed_at']
+    actions = ['export_as_excel']
+    export_filename_prefix = 'newsletter_subscribers'
+    export_fields = ('id', 'email', 'is_active', 'subscribed_at')
