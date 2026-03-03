@@ -28,6 +28,7 @@ class AuthRequiredMiddleware:
         '/lang/',
         '/static/',
         '/media/',
+        '/newsletter/',
     )
 
     def __init__(self, get_response):

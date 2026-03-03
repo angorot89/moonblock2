@@ -91,3 +91,17 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SUPPORTED_LANGUAGES = ['en', 'ar', 'fr']
 DEFAULT_LANGUAGE = 'en'
+
+# Email (used by order status notifications in admin)
+EMAIL_HOST = os.getenv('EMAIL_HOST', '').strip()
+if EMAIL_HOST:
+    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+else:
+    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'true').lower() == 'true'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'false').lower() == 'true'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'no-reply@moonblockstreetwear.com')

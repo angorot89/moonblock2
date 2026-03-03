@@ -301,9 +301,13 @@ def order_success(request, order_id):
 
 @require_POST
 def newsletter_subscribe(request):
-    email = request.POST.get('email', '').strip()
+    email = request.POST.get('email', '').strip().lower()
     if email:
         _, created = NewsletterSubscriber.objects.get_or_create(email=email)
+        if created:
+            messages.success(request, 'Subscribed successfully.')
+        else:
+            messages.info(request, 'This email is already subscribed.')
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
