@@ -201,6 +201,7 @@ section{padding:100px 48px;}
     </h2>
     <p class="about-body">{% site_t site 'about_body1' lang %}</p>
     <p class="about-body">{% site_t site 'about_body2' lang %}</p>
+    <p class="about-body" style="margin-top:-6px;opacity:.92;">{% if lang == 'ar' %}المؤسس: أمين عمراوي{% elif lang == 'fr' %}Fondateur: Amine Amraoui{% else %}Founder: Amine Amraoui{% endif %}</p>
     <a href="{% url 'shop' %}" class="btn-primary" style="align-self:flex-start;">{% site_t site 'about_cta' lang %}</a>
     <div class="stats">
       <div>
